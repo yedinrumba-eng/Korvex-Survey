@@ -341,7 +341,7 @@ body::before {
 
 /* ---------- portada ---------- */
 .intro { max-width: var(--wrap); }
-.intro .brand { height: 34px; margin-bottom: 34px; opacity: .95; }
+.intro .brand { height: 88px; margin-bottom: 30px; opacity: .95; }
 .intro h1 {
   font-size: clamp(1.9rem, 6vw, 2.85rem);
   font-weight: 500;
@@ -453,7 +453,7 @@ body::before {
   .topbar { padding: 15px 18px; }
   .opt { padding: 14px 15px; font-size: 15.5px; }
   .pick { padding: 22px 20px; }
-  .intro .brand { height: 28px; margin-bottom: 26px; }
+  .intro .brand { height: 72px; margin-bottom: 24px; }
 }
 
 /* Con transparencia reducida, el vidrio se apaga y quedan superficies sólidas. */
