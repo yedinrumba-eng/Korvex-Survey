@@ -268,7 +268,8 @@
       const a = answers[q.id];
 
       fill.style.width = ((idx) / total * 100).toFixed(1) + '%';
-      counter.textContent = `${idx + 1} / ${total}`;
+      const pad = (n) => String(n).padStart(String(total).length, '0');
+      counter.textContent = `${pad(idx + 1)} / ${total}`;
       btnUp.disabled = idx === 0;
 
       let body = '';
