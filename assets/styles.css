@@ -72,7 +72,7 @@ body::after {
   width: 78vmin;
   height: 78vmin;
   transform: translateY(-50%);
-  background: url('marca-fondo.png') no-repeat center / contain;
+  background: url('marca-fondo.svg') no-repeat center / contain;
   opacity: var(--marca);
   pointer-events: none;
   z-index: 0;
@@ -91,9 +91,8 @@ body::after {
 /* Sin soporte de backdrop-filter: relleno opaco equivalente.
    Nunca se deja texto flotando sobre el fondo. */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .glass, .opt, .textarea, .pick, .badge, .btn.ghost, .navbtn, .qmeta {
-    background: #171b28 !important;
-  }
+  .glass, .opt, .textarea, .btn.ghost, .navbtn, .qmeta { background: #171b28 !important; }
+  .pick, .badge { background: #1b2038 !important; }
 }
 
 /* ---------- barra de progreso ---------- */
@@ -188,6 +187,41 @@ body::after {
   padding: 4px 13px;
   box-shadow: var(--specular);
 }
+
+
+/* Borde de luz giratorio. El ángulo se anima con @property, que es lo que
+   permite interpolar un conic-gradient. Sin soporte, la regla @supports de
+   más abajo deja un borde fijo y todo se ve igual de bien. */
+@property --giro { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+
+.luz { position: relative; isolation: isolate; }
+.luz::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: conic-gradient(from var(--giro),
+    transparent 0deg, transparent 42deg,
+    rgba(124,138,255,.95) 74deg, rgba(180,190,255,1) 90deg, rgba(124,138,255,.95) 106deg,
+    transparent 138deg, transparent 222deg,
+    rgba(124,138,255,.6) 252deg, rgba(150,162,255,.8) 270deg, rgba(124,138,255,.6) 288deg,
+    transparent 318deg, transparent 360deg);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  animation: giroLuz 5s linear infinite;
+  pointer-events: none;
+  z-index: 2;
+}
+@keyframes giroLuz { to { --giro: 360deg; } }
+
+/* El navegador no soporta animar el ángulo: borde fijo con el mismo aspecto. */
+@supports not (background: conic-gradient(from 0deg, red, blue)) {
+  .luz::before { background: linear-gradient(135deg, rgba(124,138,255,.85), transparent 45%, transparent 60%, rgba(124,138,255,.5)); animation: none; }
+}
+@media (prefers-reduced-motion: reduce) { .luz::before { animation: none; } }
 
 /* ---------- opciones ---------- */
 .options { margin-top: 26px; display: flex; flex-direction: column; gap: 10px; }
@@ -377,24 +411,27 @@ body::after {
   display: inline-flex;
   align-items: center;
   gap: 9px;
-  background: var(--glass);
+  /* vidrio con el tinte azul-violeta en el centro, más claro arriba */
+  background:
+    linear-gradient(152deg, rgba(124,138,255,.16), rgba(124,138,255,.05) 48%, rgba(255,255,255,.03));
   -webkit-backdrop-filter: blur(var(--blur)) saturate(var(--sat));
   backdrop-filter: blur(var(--blur)) saturate(var(--sat));
-  border: 1px solid var(--glass-line);
-  box-shadow: var(--specular);
+  border: 1px solid rgba(255,255,255,.07);
+  box-shadow: var(--specular), 0 4px 18px rgba(0,0,0,.32);
   border-radius: 999px;
   padding: 9px 17px 9px 14px;
   font-size: 13.5px;
   font-family: var(--font);
   color: var(--text-2);
-  overflow: hidden;
-  transition: border-color .26s var(--ease), background .26s var(--ease), transform .18s var(--ease);
+  transition: background .26s var(--ease), transform .18s var(--ease);
 }
 .badge:hover {
-  background: var(--glass-hover);
-  border-color: rgba(116,129,241,.45);
+  background:
+    linear-gradient(152deg, rgba(124,138,255,.24), rgba(124,138,255,.08) 48%, rgba(255,255,255,.05));
   transform: translateY(-1px);
 }
+.badge > span:last-child { position: relative; z-index: 3; }
+.badge .badge-ico { position: relative; z-index: 3; }
 .badge-ico {
   display: grid;
   place-items: center;
@@ -420,24 +457,26 @@ body::after {
   display: block;
   text-align: left;
   text-decoration: none;
-  background: var(--glass);
+  background:
+    linear-gradient(152deg, rgba(124,138,255,.15), rgba(124,138,255,.045) 50%, rgba(255,255,255,.03));
   -webkit-backdrop-filter: blur(var(--blur)) saturate(var(--sat));
   backdrop-filter: blur(var(--blur)) saturate(var(--sat));
-  border: 1px solid var(--glass-line);
+  border: 1px solid rgba(255,255,255,.07);
   box-shadow: var(--specular), var(--lift);
   border-radius: var(--r-lg);
   padding: 27px 25px;
   color: var(--text);
   cursor: pointer;
-  transition: all .26s var(--ease);
+  transition: background .26s var(--ease), transform .26s var(--ease), box-shadow .26s var(--ease);
   font-family: var(--font);
 }
 .pick:hover {
-  background: var(--glass-hover);
-  border-color: rgba(116,129,241,.6);
+  background:
+    linear-gradient(152deg, rgba(124,138,255,.24), rgba(124,138,255,.08) 50%, rgba(255,255,255,.05));
   transform: translateY(-3px);
-  box-shadow: var(--specular), 0 16px 40px rgba(0,0,0,.46), 0 0 0 1px rgba(116,129,241,.3);
+  box-shadow: var(--specular), 0 16px 40px rgba(0,0,0,.46);
 }
+.pick > * { position: relative; z-index: 3; }
 .pick:focus-visible { outline: 2px solid var(--blue-text); outline-offset: 3px; }
 .pick .ico {
   width: 46px; height: 46px;
@@ -539,11 +578,13 @@ body::after {
 
 /* Con transparencia reducida, el vidrio se apaga y quedan superficies sólidas. */
 @media (prefers-reduced-transparency: reduce) {
-  .glass, .opt, .textarea, .pick, .badge, .btn.ghost, .navbtn, .qmeta, .hint kbd {
+  .glass, .opt, .textarea, .btn.ghost, .navbtn, .qmeta, .hint kbd {
     background: #171b28 !important;
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
   }
+  .pick, .badge { background: #1b2038 !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+  .luz::before { display: none; }
   .opt.selected { background: #1e2550 !important; }
   body::before, body::after { display: none; }
 }
