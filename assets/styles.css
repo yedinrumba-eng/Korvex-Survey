@@ -29,6 +29,7 @@
   --r: 14px;
   --r-lg: 20px;
   --wrap: 720px;
+  --marca: .12;            /* marca de agua del fondo — tope antes de romper contraste */
 
   --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --ease: cubic-bezier(.22, 1, .36, 1);
@@ -56,6 +57,23 @@ body::before {
     radial-gradient(48rem 34rem at 82% -6%,  rgba(47,67,234,.18), transparent 62%),
     radial-gradient(42rem 30rem at 6% 104%,  rgba(109,75,255,.12), transparent 60%),
     radial-gradient(38rem 26rem at 46% 52%,  rgba(14,126,196,.09), transparent 66%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Marca de agua. El ícono grande, sangrado por el borde derecho.
+   La opacidad se ajusta con --marca: por encima de .12 el texto deja de
+   cumplir contraste AA donde se encima al ala plateada del ícono. */
+body::after {
+  content: '';
+  position: fixed;
+  top: 50%;
+  right: -14vmin;
+  width: 78vmin;
+  height: 78vmin;
+  transform: translateY(-50%);
+  background: url('marca-fondo.png') no-repeat center / contain;
+  opacity: var(--marca);
   pointer-events: none;
   z-index: 0;
 }
@@ -351,20 +369,48 @@ body::before {
 }
 .intro p { color: var(--text-2); font-size: 17.5px; margin-bottom: 12px; }
 
+/* Píldoras informativas. El ícono flota al pasar el cursor.
+   Adaptado del botón de MrD4rio en Uiverse: se conserva el vuelo del ícono,
+   pero no la parte que desplaza el texto fuera — aquí el texto ES el dato. */
 .badges { display: flex; gap: 9px; flex-wrap: wrap; margin: 26px 0 32px; }
 .badge {
-  display: inline-flex; align-items: center; gap: 7px;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
   background: var(--glass);
   -webkit-backdrop-filter: blur(var(--blur)) saturate(var(--sat));
   backdrop-filter: blur(var(--blur)) saturate(var(--sat));
   border: 1px solid var(--glass-line);
   box-shadow: var(--specular);
   border-radius: 999px;
-  padding: 8px 15px;
+  padding: 9px 17px 9px 14px;
   font-size: 13.5px;
+  font-family: var(--font);
   color: var(--text-2);
+  overflow: hidden;
+  transition: border-color .26s var(--ease), background .26s var(--ease), transform .18s var(--ease);
 }
-.badge svg { width: 14px; height: 14px; color: var(--blue-text); }
+.badge:hover {
+  background: var(--glass-hover);
+  border-color: rgba(116,129,241,.45);
+  transform: translateY(-1px);
+}
+.badge-ico {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  color: var(--blue-text);
+  transition: transform .3s ease-in-out;
+}
+.badge:hover .badge-ico { animation: flotar .6s ease-in-out infinite alternate; }
+.badge:hover .badge-ico svg { transform: scale(1.14); }
+.badge svg { width: 15px; height: 15px; display: block; transform-origin: center; transition: transform .3s ease-in-out; }
+.badge span { display: block; }
+
+@keyframes flotar {
+  from { transform: translateY(1.5px); }
+  to   { transform: translateY(-1.5px); }
+}
 
 /* ---------- selector ---------- */
 .picker { display: grid; gap: 14px; margin-top: 34px; grid-template-columns: 1fr; }
@@ -443,9 +489,44 @@ body::before {
 
 .hp { position: absolute; left: -9999px; opacity: 0; height: 0; width: 0; pointer-events: none; }
 
+/* ---------- aviso de privacidad ---------- */
+.link-priv {
+  background: none; border: none; padding: 0;
+  font: inherit; color: var(--text-2);
+  text-decoration: underline; text-underline-offset: 3px;
+  text-decoration-color: rgba(255,255,255,.28);
+  cursor: pointer;
+}
+.link-priv:hover { color: var(--text); }
+.foot { pointer-events: auto; }
+
+.priv {
+  position: fixed; inset: 0; z-index: 90;
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+  background: rgba(4,5,10,.68);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  animation: fadeIn .22s var(--ease) both;
+}
+.priv[hidden] { display: none; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.priv-caja {
+  max-width: 480px; width: 100%;
+  border-radius: var(--r-lg);
+  padding: 26px 26px 22px;
+  animation: slideIn .3s var(--ease) both;
+}
+.priv-caja h3 { font-size: 19px; font-weight: 500; letter-spacing: -.02em; margin-bottom: 13px; }
+.priv-caja p { color: var(--text-2); font-size: 14.5px; margin-bottom: 12px; }
+.priv-caja a { color: var(--blue-text); }
+.priv-tec { font-size: 13px !important; color: var(--text-3) !important; }
+.priv-caja .btn { margin-top: 8px; }
+
 /* ---------- móvil ---------- */
 @media (max-width: 640px) {
-  :root { --blur: 16px; }          /* menos trabajo de compositor en gama media */
+  :root { --blur: 16px; --marca: .07; }   /* en pantalla estrecha el texto se le encima */          /* menos trabajo de compositor en gama media */
   body { font-size: 16px; }
   .stage { padding: 78px 18px 104px; }
   .navpad { bottom: 16px; right: 16px; }
@@ -464,7 +545,7 @@ body::before {
     backdrop-filter: none !important;
   }
   .opt.selected { background: #1e2550 !important; }
-  body::before { display: none; }
+  body::before, body::after { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {

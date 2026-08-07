@@ -1,0 +1,8 @@
+# Nada de esto debe quedar público en survey.korvexdev.cc
+.git
+.gitignore
+.editorconfig
+*.md
+supabase/
+stich/
+assets/marca/

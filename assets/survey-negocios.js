@@ -45,6 +45,19 @@ window.PREGUNTAS_NEGOCIOS = [
     ]
   },
   {
+    id: 'n28', type: 'radio', required: true,
+    title: 'En promedio, ¿cuánto gasta un cliente en una visita?',
+    help: 'Consumo por persona, un aproximado.',
+    options: [
+      { value: 'lt500', label: 'Menos de RD$500' },
+      { value: '500_1500', label: 'RD$500 a 1,500' },
+      { value: '1500_3000', label: 'RD$1,500 a 3,000' },
+      { value: '3000_6000', label: 'RD$3,000 a 6,000' },
+      { value: 'gt6000', label: 'Más de RD$6,000' },
+      { value: 'no_decir', label: 'Prefiero no decir' }
+    ]
+  },
+  {
     id: 'n4', type: 'radio', required: true,
     title: '¿Cuánto tiempo lleva operando?',
     options: [
@@ -317,10 +330,10 @@ window.PREGUNTAS_NEGOCIOS = [
   {
     id: 'n27', type: 'contact', required: false,
     title: '¿A dónde te escribimos?',
-    help: 'Todos los campos son opcionales. Solo usamos estos datos para contactarte.',
+    help: 'Solo lo usamos para escribirte sobre este estudio. No lo compartimos con nadie y puedes pedir que lo borremos cuando quieras.',
     showIf: (a) => a.n26 && a.n26.value === 'si',
     fields: [
-      { key: 'nombre', label: 'Tu nombre', placeholder: 'Nombre y apellido', autocomplete: 'name' },
+      { key: 'nombre', label: 'Tu nombre', placeholder: 'Solo tu primer nombre', autocomplete: 'given-name' },
       { key: 'negocio', label: 'Nombre del negocio', placeholder: 'Cómo se llama el local', autocomplete: 'organization' },
       { key: 'telefono', label: 'Teléfono o WhatsApp', type: 'tel', placeholder: '809 000 0000', autocomplete: 'tel' },
       { key: 'email', label: 'Correo electrónico', type: 'email', placeholder: 'tu@correo.com', autocomplete: 'email' }

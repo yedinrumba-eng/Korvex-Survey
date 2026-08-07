@@ -265,6 +265,16 @@ window.PREGUNTAS_PERSONAS = [
     ]
   },
   {
+    id: 'p30', type: 'radio', required: true,
+    title: '¿Vives en el país o estás de visita?',
+    help: 'Un turista y un residente eligen de forma muy distinta.',
+    options: [
+      { value: 'residente', label: 'Vivo en República Dominicana' },
+      { value: 'diaspora', label: 'Soy dominicano pero vivo fuera' },
+      { value: 'turista', label: 'Estoy de visita' }
+    ]
+  },
+  {
     id: 'p26', type: 'radio', required: true,
     title: '¿Qué edad tienes?',
     options: [
@@ -297,7 +307,7 @@ window.PREGUNTAS_PERSONAS = [
   {
     id: 'p29', type: 'contact', required: false,
     title: 'Déjanos tu contacto si quieres ser de los primeros en probarlo',
-    help: 'Totalmente opcional. Hasta aquí tu encuesta es anónima.',
+    help: 'Totalmente opcional. Hasta aquí tu encuesta es anónima. Solo lo usamos para avisarte, no lo compartimos con nadie y puedes pedir que lo borremos cuando quieras.',
     showIf: (a) => a.p28 && a.p28.value === 'si',
     fields: [
       { key: 'nombre', label: 'Tu nombre', placeholder: 'Como te llamamos', autocomplete: 'given-name' },

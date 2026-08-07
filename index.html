@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Estudio sobre salidas y vida social en RD</title>
-<meta name="description" content="Un estudio corto y anónimo sobre cómo se decide dónde salir en República Dominicana.">
+<title>Estudio sobre vida social en República Dominicana</title>
+<meta name="description" content="Un estudio corto y anónimo sobre cómo se socializa en República Dominicana.">
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#080a11">
-<meta property="og:title" content="Estudio sobre salidas y vida social en RD">
+<meta property="og:title" content="Estudio sobre vida social en República Dominicana">
 <meta property="og:description" content="Anónimo y toma pocos minutos. Tu respuesta ayuda mucho.">
 <meta property="og:type" content="website">
 <link rel="icon" href="assets/logo.png">
@@ -24,21 +24,21 @@
   <div class="slide intro">
     <img class="brand" src="assets/logo-full.png" alt="Korvex Surveys">
 
-    <h1>Queremos entender cómo se sale en República Dominicana.</h1>
-    <p>Estamos haciendo un estudio independiente sobre cómo las personas eligen dónde salir y cómo los negocios manejan el flujo de clientes. No vendemos nada.</p>
+    <h1>Queremos entender cómo se socializa en República Dominicana.</h1>
+    <p>Un estudio independiente sobre cómo la gente elige dónde compartir su tiempo libre, y cómo los negocios manejan el flujo de personas. No vendemos nada.</p>
 
     <div class="badges">
       <span class="badge">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-        100% anónimo
+        <span class="badge-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></span>
+        <span>100% anónimo</span>
       </span>
       <span class="badge">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-        3 a 6 minutos
+        <span class="badge-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+        <span>3 a 6 minutos</span>
       </span>
       <span class="badge">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>
-        Sin registro
+        <span class="badge-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg></span>
+        <span>Sin registro</span>
       </span>
     </div>
 
@@ -61,7 +61,7 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
         </div>
         <h3>Salgo como persona</h3>
-        <p>Sales a comer, a compartir o de noche. Queremos saber cómo decides a dónde ir. Son 3 o 4 minutos.</p>
+        <p>Sales a comer, a compartir o de noche. Queremos saber cómo eliges el lugar. Son 3 o 4 minutos.</p>
         <span class="go">Empezar la encuesta
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </span>
@@ -70,7 +70,26 @@
   </div>
 </div>
 
-<div class="foot">KORVEX SURVEYS · Estudio de investigación</div>
+<div class="foot">KORVEX SURVEYS · <button type="button" class="link-priv" id="verPriv">Privacidad</button></div>
+<div class="priv" id="priv" hidden>
+  <div class="priv-caja glass">
+    <h3>Qué hacemos con tus datos</h3>
+    <p>La encuesta es anónima. No pedimos tu nombre ni ningún dato que te identifique, salvo que al final decidas dejarnos un contacto — y eso es opcional.</p>
+    <p>Si lo dejas, solo lo vemos dos personas del equipo y lo usamos únicamente para escribirte sobre este estudio. No lo vendemos, no lo compartimos y no lo usamos para publicidad.</p>
+    <p>Puedes pedir que borremos tus datos escribiendo a <a href="mailto:yedinfermin@gmail.com">yedinfermin@gmail.com</a>.</p>
+    <p class="priv-tec">También guardamos, sin identificarte: cuánto te tomó responder, si terminaste, el tipo de dispositivo y por qué enlace llegaste. Sirve para saber si la encuesta está bien hecha.</p>
+    <button type="button" class="btn" id="cerrarPriv">Entendido</button>
+  </div>
+</div>
+<script>
+(function(){
+  var v=document.getElementById("verPriv"), c=document.getElementById("cerrarPriv"), p=document.getElementById("priv");
+  v.addEventListener("click",function(){p.hidden=false;});
+  c.addEventListener("click",function(){p.hidden=true;});
+  p.addEventListener("click",function(e){if(e.target===p)p.hidden=true;});
+  document.addEventListener("keydown",function(e){if(e.key==="Escape")p.hidden=true;});
+})();
+</script>
 
 <script>
   // Conserva el parámetro de seguimiento (?src=...) al pasar a cada encuesta,
