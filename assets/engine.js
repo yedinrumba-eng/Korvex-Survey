@@ -46,48 +46,40 @@
 
   /* ---------------- capa de persistencia ---------------- */
 
+  /* El navegador no toca la tabla directamente: solo puede ejecutar la función
+   * guardar_respuesta. Con la clave pública no se puede leer, borrar, ni
+   * modificar una respuesta ya enviada. */
   function Store(cfg, surveyType, sessionId, meta) {
     const on = !!(cfg && cfg.SUPABASE_URL && cfg.SUPABASE_ANON_KEY &&
       !/TU_/.test(cfg.SUPABASE_URL) && !/TU_/.test(cfg.SUPABASE_ANON_KEY));
-    const url = on ? cfg.SUPABASE_URL.replace(/\/+$/, '') + '/rest/v1/survey_responses' : null;
+    const url = on ? cfg.SUPABASE_URL.replace(/\/+$/, '') + '/rest/v1/rpc/guardar_respuesta' : null;
     const headers = on ? {
       'apikey': cfg.SUPABASE_ANON_KEY,
       'Authorization': 'Bearer ' + cfg.SUPABASE_ANON_KEY,
-      'Content-Type': 'application/json',
-      'Prefer': 'return=minimal'
+      'Content-Type': 'application/json'
     } : null;
-    let created = false;
+
+    async function enviar(payload, keepalive) {
+      if (!on) return false;
+      try {
+        const r = await fetch(url, {
+          method: 'POST', headers,
+          keepalive: !!keepalive,
+          body: JSON.stringify({
+            p_session_id: sessionId,
+            p_survey_type: surveyType,
+            p_payload: Object.assign({}, meta, payload)
+          })
+        });
+        if (!r.ok) console.warn('[korvex] no se pudo guardar', r.status, await r.text());
+        return r.ok;
+      } catch (e) { console.warn('[korvex] error de red al guardar', e); return false; }
+    }
 
     return {
       enabled: on,
-      async start() {
-        if (!on || created) return;
-        try {
-          const r = await fetch(url, {
-            method: 'POST', headers,
-            body: JSON.stringify([Object.assign({
-              session_id: sessionId,
-              survey_type: surveyType,
-              answers: {},
-              completed: false,
-              last_question_index: 0
-            }, meta)])
-          });
-          created = r.ok;
-          if (!r.ok) console.warn('[korvex] no se pudo crear la sesión', r.status, await r.text());
-        } catch (e) { console.warn('[korvex] error de red al iniciar', e); }
-      },
-      async patch(payload, keepalive) {
-        if (!on || !created) return false;
-        try {
-          const r = await fetch(`${url}?session_id=eq.${sessionId}`, {
-            method: 'PATCH', headers,
-            body: JSON.stringify(payload),
-            keepalive: !!keepalive
-          });
-          return r.ok;
-        } catch (e) { console.warn('[korvex] error al guardar', e); return false; }
-      }
+      start: () => enviar({ answers: {}, completed: false, last_question_index: 0 }),
+      patch: (payload, keepalive) => enviar(payload, keepalive)
     };
   }
 

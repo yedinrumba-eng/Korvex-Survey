@@ -47,29 +47,20 @@ la mayoría de las encuestas.
 
 ## Puesta en marcha
 
-### 1. Base de datos
+### 1. Base de datos — ya hecho
 
-En Supabase → **SQL Editor** → New query → pegar el contenido de
-`supabase/schema.sql` → **Run**.
+El esquema está aplicado en el proyecto Supabase **Survey**
+(`mgtxlzkvkfdodrtqpyxe`). `supabase/schema.sql` es la copia versionada, por si
+hay que recrearlo: SQL Editor → New query → pegar → Run.
 
-Crea la tabla `survey_responses`, las políticas de seguridad y cinco
-vistas de análisis.
+### 2. Credenciales — ya hecho
 
-### 2. Credenciales
+`assets/config.js` ya apunta al proyecto correcto con la clave publicable.
 
-En Supabase → **Project Settings → API**, copiar el *Project URL* y la clave
-*anon*. Pegarlas en `assets/config.js`:
-
-```js
-window.KORVEX_CONFIG = {
-  SUPABASE_URL: 'https://xxxxxxxx.supabase.co',
-  SUPABASE_ANON_KEY: 'eyJhbGciOi...'
-};
-```
-
-La clave anon es pública por diseño — está hecha para vivir en el navegador.
-Lo que protege los datos son las políticas RLS del paso anterior, que permiten
-insertar pero **no leer**. Nadie puede descargar las respuestas con esa clave.
+Esa clave es **pública por diseño** y está hecha para vivir en el navegador.
+No da acceso a nada: el navegador no tiene ningún permiso sobre la tabla, y su
+única puerta de entrada es la función `guardar_respuesta`. Con esa clave nadie
+puede leer respuestas, borrarlas, ni modificar una ya enviada.
 
 ### 3. Desplegar
 
@@ -100,8 +91,9 @@ python3 -m http.server 8080
 # abrir http://localhost:8080
 ```
 
-Con los placeholders sin reemplazar en `config.js`, la encuesta funciona
-completa pero no guarda nada — útil para revisar diseño y flujo.
+Si se ponen los placeholders `TU_...` de vuelta en `config.js`, la encuesta
+funciona completa pero no guarda nada — útil para revisar diseño y flujo sin
+ensuciar la base con respuestas de prueba.
 
 ---
 

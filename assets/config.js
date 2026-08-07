@@ -16,6 +16,6 @@
  */
 
 window.KORVEX_CONFIG = {
-  SUPABASE_URL: 'TU_SUPABASE_URL',
-  SUPABASE_ANON_KEY: 'TU_SUPABASE_ANON_KEY'
+  SUPABASE_URL: 'https://mgtxlzkvkfdodrtqpyxe.supabase.co',
+  SUPABASE_ANON_KEY: 'sb_publishable_Ffmj7P0D16Sk3Kudofo_jg_1A7sUsBt'
 };
