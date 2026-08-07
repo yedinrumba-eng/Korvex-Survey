@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Korvex Dev - Survey</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-highest": "#33343e",
+                        "tertiary-fixed-dim": "#ffb59f",
+                        "on-surface": "#e3e1ee",
+                        "on-secondary": "#262f4b",
+                        "primary-fixed-dim": "#bdc2ff",
+                        "on-secondary-fixed-variant": "#3d4662",
+                        "on-surface-variant": "#c5c5d9",
+                        "on-background": "#e3e1ee",
+                        "surface-dim": "#12131c",
+                        "on-secondary-fixed": "#111a35",
+                        "surface-container-low": "#1a1b24",
+                        "primary-fixed": "#dfe0ff",
+                        "on-primary-fixed": "#000964",
+                        "on-tertiary-fixed-variant": "#862300",
+                        "tertiary-fixed": "#ffdbd1",
+                        "primary-container": "#2f43ea",
+                        "surface-tint": "#bdc2ff",
+                        "inverse-primary": "#3347ed",
+                        "on-tertiary-fixed": "#3a0a00",
+                        "surface-container-high": "#292933",
+                        "error-container": "#93000a",
+                        "outline-variant": "#444656",
+                        "tertiary-container": "#aa2f00",
+                        "on-error-container": "#ffdad6",
+                        "background": "#12131c",
+                        "error": "#ffb4ab",
+                        "on-tertiary": "#5f1600",
+                        "secondary-container": "#3f4865",
+                        "inverse-surface": "#e3e1ee",
+                        "on-secondary-container": "#aeb7d9",
+                        "surface-container": "#1e1f28",
+                        "outline": "#8f8fa2",
+                        "primary": "#bdc2ff",
+                        "inverse-on-surface": "#2f303a",
+                        "secondary-fixed": "#dbe1ff",
+                        "secondary-fixed-dim": "#bcc5e8",
+                        "surface-bright": "#383843",
+                        "on-primary-container": "#ced1ff",
+                        "tertiary": "#ffb59f",
+                        "on-tertiary-container": "#ffc8b8",
+                        "surface-container-lowest": "#0d0e16",
+                        "on-primary-fixed-variant": "#0925d7",
+                        "on-error": "#690005",
+                        "surface-variant": "#33343e",
+                        "surface": "#12131c",
+                        "on-primary": "#00159e",
+                        "secondary": "#bcc5e8"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-lg": "48px",
+                        "margin-edge": "32px",
+                        "container-max-width": "720px",
+                        "progress-bar-height": "4px",
+                        "gutter-md": "24px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "counter-sm": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "label-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "500" }],
+                        "body-lg": ["20px", { "lineHeight": "30px", "fontWeight": "400" }],
+                        "counter-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "500" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        /* Custom styles to ensure no-scroll vertical centering */
+        body {
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background">
+<!-- Progress Bar (Absolute Top) -->
+<div class="fixed top-0 left-0 w-full h-progress-bar-height bg-surface-container-highest z-50">
+<div class="h-full bg-primary" style="width: 70%;"></div>
+</div>
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full z-40 flex justify-between items-center px-margin-edge py-4 bg-background dark:bg-background mt-progress-bar-height">
+<div class="font-label-md text-label-md font-bold text-on-surface tracking-wider">KORVEX DEV</div>
+<div class="font-counter-sm text-counter-sm text-on-surface-variant">15 →</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="w-full max-w-container-max-width px-margin-edge flex flex-col gap-stack-lg">
+<!-- Question -->
+<h1 class="font-headline-lg text-headline-lg text-on-surface text-center md:text-left">
+            ¿Qué es lo más frustrante al momento de decidir a dónde ir?
+        </h1>
+<!-- Open Text Input -->
+<div class="relative w-full">
+<textarea class="w-full h-[130px] bg-surface border border-outline-variant rounded p-gutter-md font-body-lg text-body-lg text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors resize-none" placeholder="Lo que más me molesta es…"></textarea>
+</div>
+</main>
+<!-- BottomNavBar -->
+<footer class="fixed bottom-0 left-0 w-full z-50 flex justify-between items-center px-margin-edge pb-10 bg-transparent">
+<div class="w-full max-w-container-max-width mx-auto flex justify-between items-center">
+<!-- Ghost Outlined Button (Inactive state translated to ghost per prompt) -->
+<button class="font-label-md text-label-md text-on-surface-variant px-6 py-2 border border-outline-variant rounded-full hover:text-primary hover:border-primary transition-colors">
+                Saltar
+            </button>
+<!-- Solid Primary Button (Active state) -->
+<button class="font-label-md text-label-md bg-primary text-on-primary px-6 py-2 rounded-full hover:brightness-110 transition-all opacity-100">
+                Continuar
+            </button>
+</div>
+</footer>
+</body></html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>KORVEX DEV - Gracias</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-highest": "#33343e",
+                        "tertiary-fixed-dim": "#ffb59f",
+                        "on-surface": "#e3e1ee",
+                        "on-secondary": "#262f4b",
+                        "primary-fixed-dim": "#bdc2ff",
+                        "on-secondary-fixed-variant": "#3d4662",
+                        "on-surface-variant": "#c5c5d9",
+                        "on-background": "#e3e1ee",
+                        "surface-dim": "#12131c",
+                        "on-secondary-fixed": "#111a35",
+                        "surface-container-low": "#1a1b24",
+                        "primary-fixed": "#dfe0ff",
+                        "on-primary-fixed": "#000964",
+                        "on-tertiary-fixed-variant": "#862300",
+                        "tertiary-fixed": "#ffdbd1",
+                        "primary-container": "#2f43ea",
+                        "surface-tint": "#bdc2ff",
+                        "inverse-primary": "#3347ed",
+                        "on-tertiary-fixed": "#3a0a00",
+                        "surface-container-high": "#292933",
+                        "error-container": "#93000a",
+                        "outline-variant": "#444656",
+                        "tertiary-container": "#aa2f00",
+                        "on-error-container": "#ffdad6",
+                        "background": "#12131c",
+                        "error": "#ffb4ab",
+                        "on-tertiary": "#5f1600",
+                        "secondary-container": "#3f4865",
+                        "inverse-surface": "#e3e1ee",
+                        "on-secondary-container": "#aeb7d9",
+                        "surface-container": "#1e1f28",
+                        "outline": "#8f8fa2",
+                        "primary": "#bdc2ff",
+                        "inverse-on-surface": "#2f303a",
+                        "secondary-fixed": "#dbe1ff",
+                        "secondary-fixed-dim": "#bcc5e8",
+                        "surface-bright": "#383843",
+                        "on-primary-container": "#ced1ff",
+                        "tertiary": "#ffb59f",
+                        "on-tertiary-container": "#ffc8b8",
+                        "surface-container-lowest": "#0d0e16",
+                        "on-primary-fixed-variant": "#0925d7",
+                        "on-error": "#690005",
+                        "surface-variant": "#33343e",
+                        "surface": "#12131c",
+                        "on-primary": "#00159e",
+                        "secondary": "#bcc5e8",
+                        "success-container": "#0a3622",
+                        "success-outline": "#1e7b4b",
+                        "success": "#34d399"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-lg": "48px",
+                        "margin-edge": "32px",
+                        "container-max-width": "720px",
+                        "progress-bar-height": "4px",
+                        "gutter-md": "24px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "counter-sm": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "label-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "500" }],
+                        "body-lg": ["20px", { "lineHeight": "30px", "fontWeight": "400" }],
+                        "counter-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "500" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #0a0c14; /* Specific background requested */
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+    </style>
+</head>
+<body class="text-on-background font-body-md antialiased overflow-hidden">
+<!-- Progress Bar (100%) -->
+<div class="fixed top-0 left-0 w-full h-[4px] bg-surface-container-highest z-50">
+<div class="h-full bg-primary transition-all duration-500 ease-out w-full"></div>
+</div>
+<!-- Top App Bar (From JSON, modified for completion screen) -->
+<header class="fixed top-0 left-0 w-full z-40 flex justify-between items-center px-margin-edge py-4 mt-1">
+<div class="font-label-md text-label-md font-bold text-on-surface tracking-wider">
+            KORVEX DEV
+        </div>
+<!-- No counter needed on completion screen -->
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow flex items-center justify-center px-margin-edge">
+<div class="max-w-container-max-width w-full flex flex-col items-center text-center space-y-8 animate-[fadeIn_0.5s_ease-out]">
+<!-- Success Icon -->
+<div class="w-[70px] h-[70px] rounded-full bg-success-container border border-success-outline flex items-center justify-center animate-[scaleIn_0.4s_cubic-bezier(0.175,0.885,0.32,1.275)]">
+<span class="material-symbols-outlined text-success text-[32px]" data-icon="check" data-weight="fill" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+<!-- Typography -->
+<div class="space-y-4 max-w-md mx-auto">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-on-surface">
+                    Gracias por tu tiempo.
+                </h1>
+<p class="font-body-md text-body-md text-on-surface-variant">
+                    Tus respuestas nos ayudan a entender mejor lo que viven negocios como el tuyo. Si dejaste tu contacto, te escribimos pronto.
+                </p>
+</div>
+</div>
+</main>
+<style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes scaleIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</body></html>

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>KORVEX DEV - Encuesta</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container-highest": "#33343e",
+                      "tertiary-fixed-dim": "#ffb59f",
+                      "on-surface": "#e3e1ee",
+                      "on-secondary": "#262f4b",
+                      "primary-fixed-dim": "#bdc2ff",
+                      "on-secondary-fixed-variant": "#3d4662",
+                      "on-surface-variant": "#c5c5d9",
+                      "on-background": "#e3e1ee",
+                      "surface-dim": "#12131c",
+                      "on-secondary-fixed": "#111a35",
+                      "surface-container-low": "#1a1b24",
+                      "primary-fixed": "#dfe0ff",
+                      "on-primary-fixed": "#000964",
+                      "on-tertiary-fixed-variant": "#862300",
+                      "tertiary-fixed": "#ffdbd1",
+                      "primary-container": "#2f43ea",
+                      "surface-tint": "#bdc2ff",
+                      "inverse-primary": "#3347ed",
+                      "on-tertiary-fixed": "#3a0a00",
+                      "surface-container-high": "#292933",
+                      "error-container": "#93000a",
+                      "outline-variant": "#444656",
+                      "tertiary-container": "#aa2f00",
+                      "on-error-container": "#ffdad6",
+                      "background": "#12131c",
+                      "error": "#ffb4ab",
+                      "on-tertiary": "#5f1600",
+                      "secondary-container": "#3f4865",
+                      "inverse-surface": "#e3e1ee",
+                      "on-secondary-container": "#aeb7d9",
+                      "surface-container": "#1e1f28",
+                      "outline": "#8f8fa2",
+                      "primary": "#bdc2ff",
+                      "inverse-on-surface": "#2f303a",
+                      "secondary-fixed": "#dbe1ff",
+                      "secondary-fixed-dim": "#bcc5e8",
+                      "surface-bright": "#383843",
+                      "on-primary-container": "#ced1ff",
+                      "tertiary": "#ffb59f",
+                      "on-tertiary-container": "#ffc8b8",
+                      "surface-container-lowest": "#0d0e16",
+                      "on-primary-fixed-variant": "#0925d7",
+                      "on-error": "#690005",
+                      "surface-variant": "#33343e",
+                      "surface": "#12131c",
+                      "on-primary": "#00159e",
+                      "secondary": "#bcc5e8"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "stack-lg": "48px",
+                      "margin-edge": "32px",
+                      "container-max-width": "720px",
+                      "progress-bar-height": "4px",
+                      "gutter-md": "24px"
+              },
+              "fontFamily": {
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "headline-lg-mobile": [
+                              "Inter"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "counter-sm": [
+                              "Inter"
+                      ],
+                      "headline-lg": [
+                              "Inter"
+                      ],
+                      "label-md": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg-mobile": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "body-lg": [
+                              "20px",
+                              {
+                                      "lineHeight": "30px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "counter-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "label-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "500"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        body {
+            background-color: #0a0c14; /* Forcing absolute dark background as requested */
+            overflow: hidden; /* No scrolling */
+        }
+        
+        /* Custom 1px solid border color for unselected elements as per guidelines */
+        .border-default {
+            border-color: #262c45;
+        }
+        
+        /* Custom border color for primary focus */
+        .border-primary-focus {
+            border-color: #2f43ea;
+        }
+      </style>
+</head>
+<body class="text-on-background h-screen w-screen flex flex-col items-center justify-center relative font-body-md">
+<!-- Top AppBar structure -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-margin-edge py-4 bg-background dark:bg-background border-t-4 border-primary-container">
+<!-- Progress Bar (Absolute top) -->
+<div class="absolute top-[-4px] left-0 h-progress-bar-height bg-primary-container" style="width: 30%;"></div>
+<div class="font-label-md text-label-md font-bold text-on-surface tracking-wider">
+            KORVEX DEV
+        </div>
+<div class="font-counter-sm text-counter-sm text-on-surface-variant flex items-center gap-2">
+            8 <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="w-full max-w-container-max-width px-margin-edge mx-auto flex flex-col justify-center h-full pt-16 pb-24">
+<!-- Question -->
+<h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface mb-stack-lg">
+            ¿Qué factor pesa más al elegir el lugar?
+        </h1>
+<!-- Options List -->
+<div class="flex flex-col gap-3 w-full">
+<!-- Option A (Unselected) -->
+<button class="w-full bg-[#161a2b] border border-default p-gutter-md flex items-center justify-between text-left hover:brightness-110 transition-all rounded group">
+<div class="flex items-center gap-4">
+<div class="w-8 h-8 flex items-center justify-center border border-default text-on-surface-variant font-label-md text-label-md rounded-sm group-hover:border-primary-container group-hover:text-primary-container transition-colors">A</div>
+<span class="font-body-lg text-body-lg text-on-surface">El ambiente y la gente</span>
+</div>
+</button>
+<!-- Option B (Unselected) -->
+<button class="w-full bg-[#161a2b] border border-default p-gutter-md flex items-center justify-between text-left hover:brightness-110 transition-all rounded group">
+<div class="flex items-center gap-4">
+<div class="w-8 h-8 flex items-center justify-center border border-default text-on-surface-variant font-label-md text-label-md rounded-sm group-hover:border-primary-container group-hover:text-primary-container transition-colors">B</div>
+<span class="font-body-lg text-body-lg text-on-surface">El precio</span>
+</div>
+</button>
+<!-- Option C (Selected) -->
+<button class="w-full bg-[#161a2b] border border-primary-focus p-gutter-md flex items-center justify-between text-left transition-all rounded">
+<div class="flex items-center gap-4">
+<div class="w-8 h-8 flex items-center justify-center bg-primary-container text-[#ffffff] font-label-md text-label-md rounded-sm">C</div>
+<span class="font-body-lg text-body-lg text-on-surface">La ubicación</span>
+</div>
+<span class="material-symbols-outlined text-primary-container">check</span>
+</button>
+<!-- Option D (Unselected) -->
+<button class="w-full bg-[#161a2b] border border-default p-gutter-md flex items-center justify-between text-left hover:brightness-110 transition-all rounded group">
+<div class="flex items-center gap-4">
+<div class="w-8 h-8 flex items-center justify-center border border-default text-on-surface-variant font-label-md text-label-md rounded-sm group-hover:border-primary-container group-hover:text-primary-container transition-colors">D</div>
+<span class="font-body-lg text-body-lg text-on-surface">Las opiniones o reseñas</span>
+</div>
+</button>
+<!-- Option E (Unselected) -->
+<button class="w-full bg-[#161a2b] border border-default p-gutter-md flex items-center justify-between text-left hover:brightness-110 transition-all rounded group">
+<div class="flex items-center gap-4">
+<div class="w-8 h-8 flex items-center justify-center border border-default text-on-surface-variant font-label-md text-label-md rounded-sm group-hover:border-primary-container group-hover:text-primary-container transition-colors">E</div>
+<span class="font-body-lg text-body-lg text-on-surface">La seguridad</span>
+</div>
+</button>
+<!-- Option F (Unselected) -->
+<button class="w-full bg-[#161a2b] border border-default p-gutter-md flex items-center justify-between text-left hover:brightness-110 transition-all rounded group">
+<div class="flex items-center gap-4">
+<div class="w-8 h-8 flex items-center justify-center border border-default text-on-surface-variant font-label-md text-label-md rounded-sm group-hover:border-primary-container group-hover:text-primary-container transition-colors">F</div>
+<span class="font-body-lg text-body-lg text-on-surface">Que haya espacio o disponibilidad</span>
+</div>
+</button>
+</div>
+<!-- Action Area -->
+<div class="mt-stack-lg flex items-center gap-4">
+<button class="bg-primary-container text-[#ffffff] font-label-md text-label-md px-6 py-3 rounded-full flex items-center gap-2 hover:brightness-110 transition-all">
+                Continuar
+                <span class="material-symbols-outlined text-[18px]">check</span>
+</button>
+<span class="font-body-md text-body-md text-on-surface-variant">o presiona Enter</span>
+</div>
+</main>
+<!-- BottomNavBar (Mobile only, hidden md) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex md:hidden justify-between items-center px-margin-edge pb-10 max-w-container-max-width mx-auto bg-transparent">
+<button class="text-on-surface-variant px-6 py-2 font-label-md text-label-md hover:text-primary transition-colors">
+            Saltar
+        </button>
+<button class="bg-primary text-on-primary px-6 py-2 rounded-full font-label-md text-label-md hover:text-primary transition-colors opacity-80">
+            Continuar
+        </button>
+</nav>
+</body></html>
