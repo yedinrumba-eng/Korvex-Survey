@@ -1,10 +1,41 @@
-/* Encuesta A — NEGOCIOS · v3
- * Fuente: APP-SOCIAL-DESCUBRE/ENCUESTAS_V3_FINAL.md
- * Regla de encuesta ciega: no se menciona el producto, su nombre ni sus funciones. */
+/* Encuesta a negocios · v4
+ *
+ * Instrumentos aplicados:
+ *   - Best-worst scaling (n10a / n10b) para priorizar funcionalidades
+ *   - Van Westendorp (nvw1-nvw4) para el rango de precio mensual aceptable
+ *   - Escala Juster (n24) para intención calibrada en probabilidad
+ *   - Pregunta trampa de atención (nAtt)
+ *   - rotate:true rota el orden de las opciones; las exclusivas y las de "Otro"
+ *     quedan ancladas al final. Nunca se rota una escala: el orden es el dato.
+ */
+
+/* Set fijo de funcionalidades. Las dos preguntas de best-worst tienen que
+ * ofrecer exactamente el mismo set para que la resta tenga sentido. */
+var FUNCIONALIDADES = [
+  { value: 'calendario', label: 'Gestión de reservas y calendario' },
+  { value: 'recordatorios', label: 'Recordatorios automáticos al cliente' },
+  { value: 'redes', label: 'Integración con redes sociales' },
+  { value: 'espera', label: 'Lista de espera' },
+  { value: 'pago', label: 'Pago online o cobro anticipado' },
+  { value: 'metricas', label: 'Informes y métricas' },
+  { value: 'crm', label: 'Gestión de clientes / CRM' }
+];
+
+/* Escalera de precio mensual. Idéntica en las cuatro de Van Westendorp. */
+var ESCALERA_MENSUAL = [
+  { value: '500', label: 'RD$500 al mes' },
+  { value: '1500', label: 'RD$1,500 al mes' },
+  { value: '3000', label: 'RD$3,000 al mes' },
+  { value: '5000', label: 'RD$5,000 al mes' },
+  { value: '8000', label: 'RD$8,000 al mes' },
+  { value: '12000', label: 'RD$12,000 al mes' },
+  { value: '20000', label: 'RD$20,000 al mes' },
+  { value: '35000', label: 'RD$35,000 al mes o más' }
+];
 
 window.PREGUNTAS_NEGOCIOS = [
 
-  /* ---------- Bloque 0 · Perfil del negocio ---------- */
+  /* ---------- Bloque 1 · Perfil ---------- */
   {
     id: 'n1', type: 'radio', required: true,
     title: '¿Qué tipo de negocio es?',
@@ -79,9 +110,9 @@ window.PREGUNTAS_NEGOCIOS = [
     ]
   },
 
-  /* ---------- Bloque 1 · Operación actual ---------- */
+  /* ---------- Bloque 2 · Operación ---------- */
   {
-    id: 'n6', type: 'checkbox', required: true,
+    id: 'n6', type: 'checkbox', required: true, rotate: true,
     title: '¿Cómo gestionan hoy la llegada de clientes, sea por reserva o por entrada?',
     options: [
       { value: 'telefono', label: 'Teléfono' },
@@ -128,21 +159,24 @@ window.PREGUNTAS_NEGOCIOS = [
       { value: 'otro', label: 'Otro', other: true }
     ]
   },
+
+  /* ---------- Bloque 3 · Best-worst en funcionalidades ----------
+   * Pedir la mejor Y la peor discrimina mucho más que "elige 3":
+   * al restar frecuencias sale un ranking con distancias reales. */
   {
-    id: 'n10', type: 'checkbox', required: true, maxSelect: 3,
-    title: '¿Qué funcionalidades considerarías más importantes en un sistema así?',
-    help: 'Elige las tres que más te servirían.',
-    options: [
-      { value: 'calendario', label: 'Gestión de reservas y calendario' },
-      { value: 'recordatorios', label: 'Recordatorios automáticos' },
-      { value: 'redes', label: 'Integración con redes sociales' },
-      { value: 'espera', label: 'Lista de espera' },
-      { value: 'pago', label: 'Pago online o cobro anticipado' },
-      { value: 'metricas', label: 'Informes y métricas' },
-      { value: 'crm', label: 'Gestión de clientes / CRM' },
-      { value: 'otro', label: 'Otro', other: true }
-    ]
+    id: 'n10a', type: 'radio', required: true, rotate: true, bestWorst: 'mejor',
+    title: 'De estas funcionalidades, ¿cuál sería la MÁS importante para tu negocio?',
+    help: 'Solo una. La que de verdad te resolvería el día a día.',
+    options: FUNCIONALIDADES
   },
+  {
+    id: 'n10b', type: 'radio', required: true, rotate: true, bestWorst: 'peor',
+    title: '¿Y cuál sería la MENOS importante?',
+    help: 'La que menos falta te hace.',
+    options: FUNCIONALIDADES
+  },
+
+  /* ---------- Bloque 4 · Fricción ---------- */
   {
     id: 'n11', type: 'radio', required: true,
     title: '¿Con qué frecuencia reciben cancelaciones o gente que no se presenta?',
@@ -155,7 +189,7 @@ window.PREGUNTAS_NEGOCIOS = [
     ]
   },
   {
-    id: 'n12', type: 'checkbox', required: true,
+    id: 'n12', type: 'checkbox', required: true, rotate: true,
     title: '¿Hacen algo para reducir las no presentaciones?',
     options: [
       { value: 'deposito', label: 'Depósito o pago anticipado' },
@@ -167,7 +201,7 @@ window.PREGUNTAS_NEGOCIOS = [
     ]
   },
   {
-    id: 'n13', type: 'radio', required: true,
+    id: 'n13', type: 'radio', required: true, rotate: true,
     title: '¿Cómo gestionan los picos de afluencia, como fines de semana o eventos?',
     options: [
       { value: 'personal', label: 'Aumentamos personal u horario' },
@@ -189,7 +223,20 @@ window.PREGUNTAS_NEGOCIOS = [
     ]
   },
 
-  /* ---------- Bloque 2 · Dolor real ---------- */
+  /* ---------- Control de atención ---------- */
+  {
+    id: 'nAtt', type: 'radio', required: true, atencion: 'algo_deacuerdo',
+    title: 'Para confirmar que las respuestas se están registrando bien, marca «Algo de acuerdo» en esta pregunta.',
+    options: [
+      { value: 'muy_deacuerdo', label: 'Muy de acuerdo' },
+      { value: 'algo_deacuerdo', label: 'Algo de acuerdo' },
+      { value: 'neutral', label: 'Neutral' },
+      { value: 'algo_desacuerdo', label: 'Algo en desacuerdo' },
+      { value: 'muy_desacuerdo', label: 'Muy en desacuerdo' }
+    ]
+  },
+
+  /* ---------- Bloque 5 · La fricción en tus palabras ---------- */
   {
     id: 'n15', type: 'longtext', required: true,
     title: '¿Cuál es la parte más pesada de gestionar reservas, eventos y clientes hoy?',
@@ -207,8 +254,10 @@ window.PREGUNTAS_NEGOCIOS = [
       { value: 'no_se', label: 'No sabría decir' }
     ]
   },
+
+  /* ---------- Bloque 6 · Captación ---------- */
   {
-    id: 'n17', type: 'checkbox', required: true,
+    id: 'n17', type: 'checkbox', required: true, rotate: true,
     title: 'Cuando tienen un evento o una buena noche, ¿cómo lo comunican?',
     options: [
       { value: 'instagram', label: 'Instagram, en posts o historias' },
@@ -221,8 +270,6 @@ window.PREGUNTAS_NEGOCIOS = [
       { value: 'otro', label: 'Otro', other: true }
     ]
   },
-
-  /* ---------- Bloque 3 · Inversión actual ---------- */
   {
     id: 'n18', type: 'radio', required: true,
     title: 'Aproximadamente, ¿cuánto invierten al mes en atraer clientes?',
@@ -238,7 +285,7 @@ window.PREGUNTAS_NEGOCIOS = [
     ]
   },
   {
-    id: 'n19', type: 'radio', required: false,
+    id: 'n19', type: 'radio', required: false, rotate: true,
     title: '¿En qué se va la mayor parte de esa inversión?',
     showIf: (a) => a.n18 && a.n18.value !== 'nada' && a.n18.value !== 'no_decir',
     options: [
@@ -250,8 +297,10 @@ window.PREGUNTAS_NEGOCIOS = [
       { value: 'otro', label: 'Otro', other: true }
     ]
   },
+
+  /* ---------- Bloque 7 · Modelo y precio ---------- */
   {
-    id: 'n20', type: 'radio', required: true,
+    id: 'n20', type: 'radio', required: true, rotate: true,
     title: 'Si una herramienta les llenara mesas de forma comprobable, ¿qué modelo de cobro preferirían?',
     help: 'Comprobable quiere decir con números medibles, no promesas.',
     options: [
@@ -259,26 +308,39 @@ window.PREGUNTAS_NEGOCIOS = [
       { value: 'comision', label: 'Comisión por reserva concretada' },
       { value: 'resultados', label: 'Pago solo por resultados' },
       { value: 'freemium', label: 'Gratis con funciones limitadas y pago por extras' },
-      { value: 'nada', label: 'No pagaría nada' }
+      { value: 'nada', label: 'No pagaríamos nada', exclusive: true }
     ]
   },
 
-  /* ---------- Bloque 4 · Canales digitales ---------- */
+  /* ---------- Van Westendorp ----------
+   * Misma escalera en las cuatro, sin rotar. Solo a quien no descartó pagar. */
   {
-    id: 'n21', type: 'checkbox', required: false,
-    title: '¿Qué canales usan para comunicarse con sus clientes?',
-    options: [
-      { value: 'email', label: 'Correo electrónico' },
-      { value: 'sms', label: 'SMS' },
-      { value: 'whatsapp', label: 'WhatsApp' },
-      { value: 'dm', label: 'Mensaje directo en redes' },
-      { value: 'push', label: 'Notificaciones push' },
-      { value: 'llamadas', label: 'Llamadas telefónicas' },
-      { value: 'otro', label: 'Otro', other: true }
-    ]
+    id: 'nvw1', type: 'radio', required: true,
+    title: '¿A qué precio mensual les parecería tan bajo que dudarían de la calidad del servicio?',
+    help: 'Piensa en una herramienta que les gestione reservas, clientes y flujo.',
+    showIf: (a) => a.n20 && a.n20.value !== 'nada',
+    options: ESCALERA_MENSUAL
+  },
+  {
+    id: 'nvw2', type: 'radio', required: true,
+    title: '¿A qué precio mensual les parecería una buena inversión?',
+    showIf: (a) => a.n20 && a.n20.value !== 'nada',
+    options: ESCALERA_MENSUAL
+  },
+  {
+    id: 'nvw3', type: 'radio', required: true,
+    title: '¿A qué precio mensual les empezaría a parecer caro, pero aún lo evaluarían?',
+    showIf: (a) => a.n20 && a.n20.value !== 'nada',
+    options: ESCALERA_MENSUAL
+  },
+  {
+    id: 'nvw4', type: 'radio', required: true,
+    title: '¿A qué precio mensual les parecería tan caro que ni lo considerarían?',
+    showIf: (a) => a.n20 && a.n20.value !== 'nada',
+    options: ESCALERA_MENSUAL
   },
 
-  /* ---------- Bloque 5 · Interés ---------- */
+  /* ---------- Bloque 8 · Intención ---------- */
   {
     id: 'n22', type: 'radio', required: true,
     title: '¿Estarían interesados en evaluar soluciones nuevas para gestionar reservas y flujo de clientes?',
@@ -290,7 +352,7 @@ window.PREGUNTAS_NEGOCIOS = [
     ]
   },
   {
-    id: 'n23', type: 'radio', required: true,
+    id: 'n23', type: 'radio', required: true, rotate: true,
     title: '¿Qué factor sería decisivo para adoptar una solución nueva?',
     options: [
       { value: 'costo', label: 'El costo' },
@@ -302,22 +364,31 @@ window.PREGUNTAS_NEGOCIOS = [
     ]
   },
   {
-    id: 'n24', type: 'radio', required: true,
-    title: '¿Estarían dispuestos a probar una herramienta así gratis durante un periodo de prueba?',
+    id: 'n24', type: 'radio', required: true, juster: true,
+    title: 'Si esa herramienta estuviera disponible hoy con prueba gratis, ¿qué tan probable es que la prueben en los próximos 3 meses?',
+    help: 'Sé honesto: cero es ninguna posibilidad y diez es prácticamente seguro.',
     options: [
-      { value: 'si', label: 'Sí' },
-      { value: 'tal_vez', label: 'Tal vez, dependería de lo que implique' },
-      { value: 'no', label: 'No' }
+      { value: '10', label: '10 · Prácticamente seguro' },
+      { value: '9', label: '9 · Casi seguro' },
+      { value: '8', label: '8 · Muy probable' },
+      { value: '7', label: '7 · Bastante probable' },
+      { value: '6', label: '6 · Buena posibilidad' },
+      { value: '5', label: '5 · Posibilidad media' },
+      { value: '4', label: '4 · Posibilidad moderada' },
+      { value: '3', label: '3 · Alguna posibilidad' },
+      { value: '2', label: '2 · Poca posibilidad' },
+      { value: '1', label: '1 · Muy poca posibilidad' },
+      { value: '0', label: '0 · Ninguna posibilidad' }
     ]
   },
+
+  /* ---------- Bloque 9 · Cierre ---------- */
   {
     id: 'n25', type: 'longtext', required: false,
     title: '¿Qué necesitarían ver para confiar en una herramienta así?',
     help: 'Opcional, pero es de lo más útil que nos puedes dejar.',
     placeholder: '¿Qué te haría decir que sí, o qué te haría desconfiar?'
   },
-
-  /* ---------- Cierre ---------- */
   {
     id: 'n26', type: 'radio', required: true,
     title: '¿Deseas que te contactemos con más información o una demostración?',

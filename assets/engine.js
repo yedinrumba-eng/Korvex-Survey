@@ -1,21 +1,13 @@
-/* KORVEX SURVEY — motor de encuestas
- * Una pregunta a la vez, navegación por teclado, lógica condicional,
- * guardado automático local y envío a Supabase.
- * No depende de ninguna librería externa. */
-
 (function (global) {
   'use strict';
 
   const ICON = {
     arrow: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>',
-    down: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>',
-    up: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>',
-    check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>',
-    lock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>',
-    clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>'
+    check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>'
   };
 
   const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) =>
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
@@ -25,6 +17,30 @@
       const r = (Math.random() * 16) | 0;
       return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16);
     });
+  }
+
+  /* ---------- Aleatoriedad reproducible ----------
+   * El orden de las opciones se deriva del id de sesión, así que es distinto
+   * entre personas pero estable para la misma persona: si vuelve atrás, las
+   * opciones siguen donde estaban. */
+  function semillaDe(txt) {
+    let h = 2166136261;
+    for (let i = 0; i < txt.length; i++) {
+      h ^= txt.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  }
+
+  function prng(semilla) {
+    let s = semilla >>> 0;
+    return function () {
+      s = (s + 0x6d2b79f5) >>> 0;
+      let t = s;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
   }
 
   function collectMeta() {
@@ -44,11 +60,6 @@
     };
   }
 
-  /* ---------------- capa de persistencia ---------------- */
-
-  /* El navegador no toca la tabla directamente: solo puede ejecutar la función
-   * guardar_respuesta. Con la clave pública no se puede leer, borrar, ni
-   * modificar una respuesta ya enviada. */
   function Store(cfg, surveyType, sessionId, meta) {
     const on = !!(cfg && cfg.SUPABASE_URL && cfg.SUPABASE_ANON_KEY &&
       !/TU_/.test(cfg.SUPABASE_URL) && !/TU_/.test(cfg.SUPABASE_ANON_KEY));
@@ -83,8 +94,6 @@
     };
   }
 
-  /* ---------------- motor ---------------- */
-
   function Survey(opts) {
     const questions = opts.questions;
     const type = opts.surveyType;
@@ -98,10 +107,13 @@
     let dir = 1;
     let sending = false;
     let finished = false;
-    let autoTimer = null;   // temporizador de avance automático del radio
-    let moving = false;     // evita avanzar dos veces con un doble clic rápido
+    let autoTimer = null;
+    let moving = false;
 
-    // recuperar sesión previa (si el navegador se cerró a media encuesta)
+    /* Tiempo por pregunta, para detectar quien pasa sin leer. */
+    const tiempos = {};
+    let tsPregunta = Date.now();
+
     try {
       const raw = localStorage.getItem(storeKey);
       if (raw) {
@@ -111,9 +123,10 @@
           sessionId = s.sessionId;
           startedAt = s.startedAt;
           idx = s.idx || 0;
+          Object.assign(tiempos, s.tiempos || {});
         }
       }
-    } catch (e) { /* localStorage bloqueado — seguimos sin recuperar */ }
+    } catch (e) { /* localStorage bloqueado: seguimos sin recuperación */ }
 
     const meta = collectMeta();
     const store = Store(cfg, type, sessionId, meta);
@@ -126,22 +139,51 @@
 
     const saveLocal = () => {
       try {
-        localStorage.setItem(storeKey, JSON.stringify({ sessionId, startedAt, answers, idx, finished }));
-      } catch (e) { /* sin espacio o bloqueado */ }
+        localStorage.setItem(storeKey, JSON.stringify({
+          sessionId, startedAt, answers, idx, finished, tiempos
+        }));
+      } catch (e) { /* sin persistencia, la encuesta sigue funcionando */ }
     };
 
-    /* --- preguntas visibles según la lógica condicional --- */
-    const visible = () => questions.filter((q) => !q.showIf || q.showIf(answers));
+    /* ---------- Rotación de opciones ----------
+     * Solo rota las preguntas marcadas con rotate:true. Las opciones
+     * exclusivas ("Ninguno", "No hacemos nada") y las de "Otro" quedan
+     * ancladas al final: moverlas confunde en vez de quitar sesgo.
+     * Las escalas nunca se rotan, ahí el orden ES el dato. */
+    const ordenCache = {};
 
+    function opcionesDe(q) {
+      if (!q.options) return [];
+      if (!q.rotate) return q.options;
+      if (ordenCache[q.id]) return ordenCache[q.id];
+
+      const libres = [];
+      const ancladas = [];
+      q.options.forEach((o) => {
+        if (o.exclusive || o.other) ancladas.push(o);
+        else libres.push(o);
+      });
+
+      const r = prng(semillaDe(sessionId + '|' + q.id));
+      for (let i = libres.length - 1; i > 0; i--) {
+        const j = Math.floor(r() * (i + 1));
+        const t = libres[i]; libres[i] = libres[j]; libres[j] = t;
+      }
+
+      ordenCache[q.id] = libres.concat(ancladas);
+      return ordenCache[q.id];
+    }
+
+    const visible = () => questions.filter((q) => !q.showIf || q.showIf(answers));
     const current = () => visible()[Math.min(idx, visible().length - 1)];
 
     const countSkipped = () =>
       visible().filter((q) => !q.required && (answers[q.id] == null || answers[q.id] === '')).length;
 
-    /* --- validación --- */
     function validate(q) {
       const v = answers[q.id];
       if (!q.required) return null;
+
       if (q.type === 'checkbox') {
         if (!v || !v.selected || !v.selected.length) return 'Selecciona al menos una opción.';
         if (q.maxSelect && v.selected.length > q.maxSelect) return `Puedes elegir hasta ${q.maxSelect}.`;
@@ -152,25 +194,82 @@
         if (needsOther && !(v.other || '').trim()) return 'Especifica tu respuesta en el campo de texto.';
         return null;
       }
+
       if (q.type === 'radio') {
         if (!v || !v.value) return 'Selecciona una opción para continuar.';
         const o = q.options.find((x) => x.value === v.value);
         if (o && o.other && !(v.other || '').trim()) return 'Especifica tu respuesta en el campo de texto.';
         return null;
       }
+
       if (q.type === 'text' || q.type === 'longtext') {
         const t = (v || '').trim();
         if (!t) return 'Esta pregunta es necesaria para el estudio.';
         if (q.type === 'longtext' && t.length < 8) return 'Cuéntanos un poco más, por favor.';
         return null;
       }
+
       return null;
     }
 
-    /* --- navegación --- */
+    /* ---------- Marcadores de calidad ----------
+     * No descartan a nadie automáticamente. Se guardan como banderas para
+     * poder filtrar al analizar, que es como trabaja una casa encuestadora. */
+    function calidad() {
+      const lista = visible();
+      const segundos = Math.round((Date.now() - startedAt) / 1000);
+
+      /* Trampa de atención: comparamos contra el valor que la pregunta pedía. */
+      let atencion = null;
+      lista.forEach((q) => {
+        if (!q.atencion) return;
+        const v = answers[q.id];
+        atencion = !!(v && v.value === q.atencion);
+      });
+
+      /* Línea recta: la racha más larga de radios seguidos contestados en la
+       * misma posición de pantalla. Con rotación activa esto es aún más
+       * revelador, porque la misma posición ya no significa la misma opción. */
+      let racha = 0, mejorRacha = 0, previa = null;
+      lista.forEach((q) => {
+        if (q.type !== 'radio') { racha = 0; previa = null; return; }
+        const v = answers[q.id];
+        if (!v || typeof v.pos !== 'number') { racha = 0; previa = null; return; }
+        if (previa !== null && v.pos === previa) { racha += 1; } else { racha = 1; }
+        previa = v.pos;
+        if (racha > mejorRacha) mejorRacha = racha;
+      });
+
+      /* Longitud media de las respuestas abiertas: otra señal de esfuerzo. */
+      const abiertas = lista.filter((q) => q.type === 'longtext' || q.type === 'text');
+      const largos = abiertas.map((q) => String(answers[q.id] || '').trim().length);
+      const largoMedio = largos.length
+        ? Math.round(largos.reduce((a, b) => a + b, 0) / largos.length)
+        : 0;
+
+      return {
+        duracion_segundos: segundos,
+        segundos_por_pregunta: lista.length ? +(segundos / lista.length).toFixed(1) : 0,
+        apurado: segundos < lista.length * 3,
+        linea_recta_max: mejorRacha,
+        sospecha_linea_recta: mejorRacha >= 6,
+        atencion_ok: atencion,
+        largo_medio_abiertas: largoMedio,
+        tiempos_por_pregunta: tiempos
+      };
+    }
+
+    function registrarTiempo(q) {
+      if (!q) return;
+      const t = Math.round((Date.now() - tsPregunta) / 1000);
+      tiempos[q.id] = (tiempos[q.id] || 0) + Math.max(0, Math.min(t, 600));
+      tsPregunta = Date.now();
+    }
+
     function go(delta) {
       if (moving || finished) return;
       if (autoTimer) { clearTimeout(autoTimer); autoTimer = null; }
+
       const list = visible();
       if (delta > 0) {
         const q = list[idx];
@@ -179,18 +278,25 @@
         if (idx >= list.length - 1) return submit();
       }
       if (delta < 0 && idx === 0) return;
+
+      registrarTiempo(list[idx]);
+
       moving = true;
       dir = delta;
+
       const old = stage.querySelector('.slide');
       if (old) old.classList.add('leaving');
+
       idx = Math.max(0, idx + delta);
       saveLocal();
+
       store.patch({
         answers,
         last_question_index: idx,
         last_question_id: (visible()[idx] || {}).id || null,
         updated_at: new Date().toISOString()
       });
+
       setTimeout(function () { moving = false; render(); }, old ? 150 : 0);
     }
 
@@ -199,59 +305,59 @@
       if (e) { e.textContent = msg; }
     }
 
-    /* --- envío final --- */
     async function submit() {
       if (sending) return;
-      // trampa antibots: si el campo oculto viene lleno, es un robot
+
       const hp = document.querySelector('.hp input');
       if (hp && hp.value) { renderDone(); return; }
 
       sending = true;
+      registrarTiempo(current());
+
       const btn = stage.querySelector('.btn:not(.ghost)');
       if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Enviando…'; }
 
-      const duration = Math.round((Date.now() - startedAt) / 1000);
       const payload = {
         answers,
         completed: true,
         submitted_at: new Date().toISOString(),
-        duration_seconds: duration,
+        duration_seconds: Math.round((Date.now() - startedAt) / 1000),
         last_question_index: visible().length,
         total_questions: visible().length,
         skipped_optional: countSkipped(),
+        calidad: calidad(),
         updated_at: new Date().toISOString()
       };
 
       let ok = await store.patch(payload);
-      if (!ok && store.enabled) ok = await store.patch(payload); // un reintento
+      if (!ok && store.enabled) ok = await store.patch(payload);
 
       finished = true;
       saveLocal();
       try { localStorage.removeItem(storeKey); } catch (e) {}
 
       if (!ok && store.enabled) {
-        // no se perdió nada: queda en el navegador para recuperarlo manualmente
         try { localStorage.setItem('korvex_pendiente_' + sessionId, JSON.stringify(payload)); } catch (e) {}
       }
+
       renderDone();
     }
-
-    /* --- dibujado de cada tipo de pregunta --- */
 
     function optionsHTML(q, sel, otherVal) {
       const isCheck = q.type === 'checkbox';
       const selected = isCheck ? (sel || []) : (sel ? [sel] : []);
       const atMax = isCheck && q.maxSelect && selected.length >= q.maxSelect;
+      const lista = opcionesDe(q);
 
-      return q.options.map((o, i) => {
+      return lista.map((o, i) => {
         const on = selected.indexOf(o.value) > -1;
         const blocked = atMax && !on;
         const rows = [
           `<button type="button" class="opt${on ? ' selected' : ''}${blocked ? ' disabled' : ''}" data-val="${esc(o.value)}"${blocked ? ' disabled' : ''}>
-             <span class="key">${LETTERS[i] || (i + 1)}</span>
-             <span class="opt-label">${esc(o.label)}</span>
-             <span class="tick">${ICON.check}</span>
-           </button>`
+            <span class="key">${LETTERS[i] || (i + 1)}</span>
+            <span class="opt-label">${esc(o.label)}</span>
+            <span class="tick">${ICON.check}</span>
+          </button>`
         ];
         if (o.other && on) {
           rows.push(`<input class="other-input" data-other="1" placeholder="Escribe cuál…" value="${esc(otherVal || '')}" autocomplete="off">`);
@@ -263,9 +369,12 @@
     function render() {
       const list = visible();
       if (idx >= list.length) { submit(); return; }
+
       const q = list[idx];
       const total = list.length;
       const a = answers[q.id];
+
+      tsPregunta = Date.now();
 
       fill.style.width = ((idx) / total * 100).toFixed(1) + '%';
       const pad = (n) => String(n).padStart(String(total).length, '0');
@@ -316,6 +425,7 @@
         </div>`;
 
       wire(q);
+
       const inp = document.getElementById('inp');
       if (inp && window.matchMedia('(min-width: 720px)').matches) inp.focus();
     }
@@ -348,28 +458,42 @@
       });
 
       slide.querySelector('#next').addEventListener('click', () => go(1));
+
       const sk = slide.querySelector('#skip');
       if (sk) sk.addEventListener('click', () => { answers[q.id] = ''; go(1); });
     }
 
     function pick(q, value) {
       if (moving) return;
-      const opt = q.options.find((o) => o.value === value);
+
+      const lista = opcionesDe(q);
+      const pos = lista.findIndex((o) => o.value === value);
+      const opt = lista[pos];
       if (!opt) return;
+
       if (autoTimer) { clearTimeout(autoTimer); autoTimer = null; }
 
       if (q.type === 'radio') {
         const prev = answers[q.id] || {};
-        answers[q.id] = { value, label: opt.label, other: opt.other ? (prev.other || '') : undefined };
+        answers[q.id] = {
+          value,
+          label: opt.label,
+          pos,
+          other: opt.other ? (prev.other || '') : undefined
+        };
         saveLocal();
-        if (opt.other) { render(); setTimeout(() => { const o = stage.querySelector('[data-other]'); if (o) o.focus(); }, 60); return; }
-        // avance automático con un respiro visual para que se vea la selección
+
+        if (opt.other) {
+          render();
+          setTimeout(() => { const o = stage.querySelector('[data-other]'); if (o) o.focus(); }, 60);
+          return;
+        }
+
         render();
         autoTimer = setTimeout(() => { autoTimer = null; if (!validate(q)) go(1); }, 340);
         return;
       }
 
-      // checkbox
       const cur = (answers[q.id] && answers[q.id].selected) || [];
       let next;
       if (cur.indexOf(value) > -1) {
@@ -383,6 +507,7 @@
         }
         if (q.maxSelect && next.length > q.maxSelect) next = next.slice(-q.maxSelect);
       }
+
       const labels = next.map((v) => (q.options.find((o) => o.value === v) || {}).label);
       answers[q.id] = Object.assign({}, answers[q.id], { selected: next, labels });
       saveLocal();
@@ -402,26 +527,29 @@
         </div>`;
     }
 
-    /* --- teclado --- */
     document.addEventListener('keydown', (e) => {
       if (finished) return;
       const q = current();
       if (!q) return;
+
       const typing = /INPUT|TEXTAREA/.test((e.target.tagName || ''));
 
       if (e.key === 'Enter') {
-        if (q.type === 'longtext' && typing && !e.metaKey && !e.ctrlKey) return; // permitir saltos de línea
+        if (q.type === 'longtext' && typing && !e.metaKey && !e.ctrlKey) return;
         e.preventDefault();
         go(1);
         return;
       }
+
       if (typing) return;
 
       if ((q.type === 'radio' || q.type === 'checkbox') && /^[a-zA-Z]$/.test(e.key)) {
         const i = LETTERS.indexOf(e.key.toUpperCase());
-        if (i > -1 && q.options[i]) { e.preventDefault(); pick(q, q.options[i].value); }
+        const lista = opcionesDe(q);
+        if (i > -1 && lista[i]) { e.preventDefault(); pick(q, lista[i].value); }
         return;
       }
+
       if (e.key === 'ArrowDown' || e.key === 'PageDown') { e.preventDefault(); go(1); }
       if (e.key === 'ArrowUp' || e.key === 'PageUp') { e.preventDefault(); go(-1); }
     });
@@ -429,18 +557,18 @@
     btnUp.addEventListener('click', () => go(-1));
     btnDown.addEventListener('click', () => go(1));
 
-    // guardar el progreso si cierran la pestaña a media encuesta
     global.addEventListener('pagehide', () => {
       if (finished) return;
+      registrarTiempo(current());
       store.patch({
         answers,
         last_question_index: idx,
         last_question_id: (current() || {}).id || null,
+        calidad: calidad(),
         updated_at: new Date().toISOString()
       }, true);
     });
 
-    /* --- arranque --- */
     this.start = async function () {
       await store.start();
       render();

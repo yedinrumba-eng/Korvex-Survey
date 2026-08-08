@@ -1,10 +1,29 @@
-/* Encuesta B — PERSONAS · v3
- * Fuente: APP-SOCIAL-DESCUBRE/ENCUESTAS_V3_FINAL.md
- * Regla de encuesta ciega: no se menciona el producto, su nombre ni sus funciones. */
+/* Encuesta a personas · v4
+ *
+ * Instrumentos aplicados:
+ *   - Van Westendorp (pvw1-pvw4) para el rango de precio aceptable
+ *   - Escala Juster (p24) para intención calibrada en probabilidad
+ *   - Pregunta trampa de atención (pAtt)
+ *   - rotate:true rota el orden de las opciones; las exclusivas y las de "Otro"
+ *     quedan ancladas al final. Nunca se rota una escala: el orden es el dato.
+ */
+
+/* Escalera de precios compartida por las cuatro preguntas de Van Westendorp.
+ * Tiene que ser idéntica en las cuatro para que el cruce de curvas funcione. */
+var ESCALERA_PRECIO = [
+  { value: '25', label: 'RD$25' },
+  { value: '50', label: 'RD$50' },
+  { value: '100', label: 'RD$100' },
+  { value: '150', label: 'RD$150' },
+  { value: '250', label: 'RD$250' },
+  { value: '400', label: 'RD$400' },
+  { value: '600', label: 'RD$600' },
+  { value: '1000', label: 'RD$1,000 o más' }
+];
 
 window.PREGUNTAS_PERSONAS = [
 
-  /* ---------- Bloque 1 · Contexto ---------- */
+  /* ---------- Bloque 1 · Hábito ---------- */
   {
     id: 'p1', type: 'radio', required: true,
     title: 'Cuando decides salir, ¿qué tipo de plan haces con más frecuencia?',
@@ -25,7 +44,7 @@ window.PREGUNTAS_PERSONAS = [
     ]
   },
   {
-    id: 'p3', type: 'radio', required: true,
+    id: 'p3', type: 'radio', required: true, rotate: true,
     title: '¿Con quién sueles salir la mayoría de las veces?',
     options: [
       { value: 'pareja', label: 'Pareja' },
@@ -58,9 +77,9 @@ window.PREGUNTAS_PERSONAS = [
     ]
   },
 
-  /* ---------- Bloque 2 · Comportamiento real ---------- */
+  /* ---------- Bloque 2 · Decisión ---------- */
   {
-    id: 'p6', type: 'checkbox', required: true,
+    id: 'p6', type: 'checkbox', required: true, rotate: true,
     title: 'La última vez que saliste, ¿cómo decidiste a dónde ir?',
     help: 'Marca todo lo que aplique.',
     options: [
@@ -84,7 +103,7 @@ window.PREGUNTAS_PERSONAS = [
     ]
   },
   {
-    id: 'p8', type: 'radio', required: true,
+    id: 'p8', type: 'radio', required: true, rotate: true,
     title: '¿Qué factor pesa más al elegir el lugar?',
     options: [
       { value: 'ambiente', label: 'El ambiente y la gente' },
@@ -105,6 +124,8 @@ window.PREGUNTAS_PERSONAS = [
       { value: 'muy_dificil', label: 'Muy difícil' }
     ]
   },
+
+  /* ---------- Bloque 3 · Fricción ---------- */
   {
     id: 'p10', type: 'radio', required: true,
     title: '¿Te ha pasado llegar a un lugar y que no esté como esperabas?',
@@ -127,8 +148,6 @@ window.PREGUNTAS_PERSONAS = [
       { value: 'depende', label: 'Depende' }
     ]
   },
-
-  /* ---------- Bloque 3 · Reservas ---------- */
   {
     id: 'p12', type: 'radio', required: true,
     title: '¿Has intentado asegurar tu entrada o mesa antes de salir?',
@@ -139,7 +158,7 @@ window.PREGUNTAS_PERSONAS = [
     ]
   },
   {
-    id: 'p13', type: 'checkbox', required: true,
+    id: 'p13', type: 'checkbox', required: true, rotate: true,
     title: '¿Cómo lo haces normalmente?',
     help: 'Marca todo lo que aplique.',
     showIf: (a) => a.p12 && a.p12.value !== 'nunca',
@@ -165,32 +184,42 @@ window.PREGUNTAS_PERSONAS = [
     ]
   },
 
-  /* ---------- Bloque 4 · Profundidad ---------- */
-  {
-    id: 'p15', type: 'longtext', required: true,
-    title: 'Cuéntanos paso a paso qué haces antes de salir a algún lugar.',
-    help: 'Desde que te nace la idea hasta que llegas. Mientras más detalle, mejor.',
-    placeholder: 'Normalmente empiezo por…'
-  },
+  /* ---------- Bloque 4 · La fricción en tus palabras ----------
+   * Única abierta de la primera mitad, y llega justo cuando el tema
+   * de la frustración ya está abierto en la cabeza del que responde. */
   {
     id: 'p16', type: 'longtext', required: true,
     title: '¿Qué es lo más frustrante al momento de decidir a dónde ir?',
+    help: 'Con tus palabras. Esta es la que más nos ayuda de toda la encuesta.',
     placeholder: 'Lo que más me molesta es…'
   },
   {
-    id: 'p17', type: 'longtext', required: false,
-    title: 'Describe una ocasión donde el plan no salió como esperabas. ¿Qué pasó?',
-    placeholder: 'Una vez fuimos a…'
+    id: 'p18', type: 'radio', required: true, rotate: true,
+    title: '¿Qué es lo que más te arruina una salida cuando falla?',
+    options: [
+      { value: 'ambiente', label: 'Que el ambiente no sea el que esperaba' },
+      { value: 'esperas', label: 'Las filas y las esperas' },
+      { value: 'sin_espacio', label: 'Llegar y que no haya espacio' },
+      { value: 'precio', label: 'Que salga más caro de lo que pensaba' },
+      { value: 'musica', label: 'Que la música o el sonido estén mal' },
+      { value: 'servicio', label: 'Que el servicio sea lento o malo' },
+      { value: 'seguridad', label: 'No sentirme seguro' },
+      { value: 'otro', label: 'Otro', other: true }
+    ]
   },
+
+  /* ---------- Control de atención ----------
+   * Va camuflada entre escalas del mismo formato, a media encuesta. */
   {
-    id: 'p18', type: 'longtext', required: false,
-    title: '¿Qué tendría que pasar para que una salida sea perfecta para ti?',
-    placeholder: 'Para mí sería perfecta si…'
-  },
-  {
-    id: 'p19', type: 'longtext', required: false,
-    title: 'Si pudieras cambiar algo de cómo eliges lugares hoy, ¿qué cambiarías?',
-    placeholder: 'Cambiaría que…'
+    id: 'pAtt', type: 'radio', required: true, atencion: 'rara_vez',
+    title: 'Para confirmar que las respuestas se están registrando bien, marca «Rara vez» en esta pregunta.',
+    options: [
+      { value: 'siempre', label: 'Siempre' },
+      { value: 'frecuente', label: 'Frecuentemente' },
+      { value: 'a_veces', label: 'A veces' },
+      { value: 'rara_vez', label: 'Rara vez' },
+      { value: 'nunca', label: 'Nunca' }
+    ]
   },
 
   /* ---------- Bloque 5 · Dinero ---------- */
@@ -218,15 +247,42 @@ window.PREGUNTAS_PERSONAS = [
   },
   {
     id: 'p22', type: 'radio', required: true,
-    title: 'Si al reservar tu lugar quedara garantizado al instante, ¿aceptarías un pequeño cargo de servicio?',
+    title: 'Si al reservar, tu lugar quedara garantizado al instante, ¿considerarías pagar un cargo por el servicio?',
     help: 'Sin filas y sin tener que escribirle a nadie.',
     options: [
-      { value: 'nada', label: 'No pagaría nada' },
-      { value: 'lt100', label: 'Hasta RD$100' },
-      { value: '100_250', label: 'RD$100 a 250' },
-      { value: '250_500', label: 'RD$250 a 500' },
-      { value: 'depende', label: 'Depende del lugar o del evento' }
+      { value: 'si', label: 'Sí, lo consideraría' },
+      { value: 'depende', label: 'Depende del lugar o del evento' },
+      { value: 'no', label: 'No pagaría nada, nunca' }
     ]
+  },
+
+  /* ---------- Van Westendorp ----------
+   * Las cuatro usan la misma escalera y NO se rotan: el orden es el dato.
+   * Solo se muestran a quien no descartó pagar. */
+  {
+    id: 'pvw1', type: 'radio', required: true,
+    title: '¿A qué precio te parecería tan bajo que dudarías de que el servicio de verdad funcione?',
+    help: 'Piensa en el cargo por asegurar tu lugar en una salida.',
+    showIf: (a) => a.p22 && a.p22.value !== 'no',
+    options: ESCALERA_PRECIO
+  },
+  {
+    id: 'pvw2', type: 'radio', required: true,
+    title: '¿A qué precio te parecería una buena oferta por ese servicio?',
+    showIf: (a) => a.p22 && a.p22.value !== 'no',
+    options: ESCALERA_PRECIO
+  },
+  {
+    id: 'pvw3', type: 'radio', required: true,
+    title: '¿A qué precio te empezaría a parecer caro, pero aún así lo pensarías?',
+    showIf: (a) => a.p22 && a.p22.value !== 'no',
+    options: ESCALERA_PRECIO
+  },
+  {
+    id: 'pvw4', type: 'radio', required: true,
+    title: '¿A qué precio te parecería tan caro que ni lo considerarías?',
+    showIf: (a) => a.p22 && a.p22.value !== 'no',
+    options: ESCALERA_PRECIO
   },
 
   /* ---------- Bloque 6 · Intención ---------- */
@@ -242,16 +298,35 @@ window.PREGUNTAS_PERSONAS = [
     ]
   },
   {
-    id: 'p24', type: 'radio', required: true,
-    title: 'Si además pudieras asegurar tu entrada o mesa desde el celular, sin llamar ni escribir, ¿la usarías?',
+    id: 'p24', type: 'radio', required: true, juster: true,
+    title: 'Si esa app existiera hoy, ¿qué tan probable es que la uses en tu próxima salida?',
+    help: 'Sé honesto: cero es ninguna posibilidad y diez es prácticamente seguro.',
     options: [
-      { value: 'no', label: 'No' },
-      { value: 'tal_vez', label: 'Tal vez' },
-      { value: 'si', label: 'Sí' }
+      { value: '10', label: '10 · Prácticamente seguro' },
+      { value: '9', label: '9 · Casi seguro' },
+      { value: '8', label: '8 · Muy probable' },
+      { value: '7', label: '7 · Bastante probable' },
+      { value: '6', label: '6 · Buena posibilidad' },
+      { value: '5', label: '5 · Posibilidad media' },
+      { value: '4', label: '4 · Posibilidad moderada' },
+      { value: '3', label: '3 · Alguna posibilidad' },
+      { value: '2', label: '2 · Poca posibilidad' },
+      { value: '1', label: '1 · Muy poca posibilidad' },
+      { value: '0', label: '0 · Ninguna posibilidad' }
     ]
   },
 
-  /* ---------- Bloque 7 · Segmentación ---------- */
+  /* ---------- Bloque 7 · El proceso, en tus palabras ----------
+   * La segunda abierta va tarde a propósito: quien llegó hasta aquí
+   * ya invirtió tiempo y escribe mucho más que en la pregunta 15. */
+  {
+    id: 'p15', type: 'longtext', required: true,
+    title: 'Cuéntanos paso a paso qué haces antes de salir a algún lugar.',
+    help: 'Desde que te nace la idea hasta que llegas. Mientras más detalle, mejor.',
+    placeholder: 'Normalmente empiezo por…'
+  },
+
+  /* ---------- Bloque 8 · Segmentación ---------- */
   {
     id: 'p25', type: 'radio', required: true,
     title: '¿En qué ciudad vives?',
@@ -294,8 +369,6 @@ window.PREGUNTAS_PERSONAS = [
       { value: 'nd', label: 'Prefiero no decirlo' }
     ]
   },
-
-  /* ---------- Cierre ---------- */
   {
     id: 'p28', type: 'radio', required: true,
     title: '¿Te gustaría probar nuevas formas de encontrar y organizar tus salidas?',
