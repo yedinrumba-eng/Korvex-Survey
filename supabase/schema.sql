@@ -21,6 +21,13 @@ create table if not exists public.survey_responses (
   --   contacto  → { "nombre": "...", "email": "...", "telefono": "..." }
   answers             jsonb not null default '{}'::jsonb,
 
+  -- Marcadores de calidad de la respuesta. No descartan a nadie por sí solos:
+  -- son banderas para poder filtrar al analizar.
+  --   { "apurado": bool, "sospecha_linea_recta": bool, "atencion_ok": bool,
+  --     "linea_recta_max": int, "largo_medio_abiertas": int,
+  --     "segundos_por_pregunta": num, "tiempos_por_pregunta": {...} }
+  calidad             jsonb,
+
   completed           boolean not null default false,
   last_question_id    text,
   last_question_index int default 0,
@@ -80,6 +87,7 @@ as $$
 declare
   v_answers   jsonb   := coalesce(p_payload->'answers', '{}'::jsonb);
   v_completed boolean := coalesce((p_payload->>'completed')::boolean, false);
+  v_calidad   jsonb   := p_payload->'calidad';
   v_filas     int;
 begin
   if p_session_id is null then
@@ -94,15 +102,18 @@ begin
   if pg_column_size(v_answers) > 65536 then
     raise exception 'respuesta demasiado grande';
   end if;
+  if v_calidad is not null and (jsonb_typeof(v_calidad) <> 'object' or pg_column_size(v_calidad) > 8192) then
+    v_calidad := null;   -- basura entrante: se ignora, no tumba el guardado
+  end if;
 
   insert into public.survey_responses (
-    session_id, survey_type, answers, completed,
+    session_id, survey_type, answers, completed, calidad,
     last_question_id, last_question_index, total_questions, skipped_optional,
     duration_seconds, submitted_at,
     source, campaign, referrer, device_type, user_agent, language, screen, timezone,
     updated_at
   ) values (
-    p_session_id, p_survey_type, v_answers, v_completed,
+    p_session_id, p_survey_type, v_answers, v_completed, v_calidad,
     left(p_payload->>'last_question_id', 40),
     (p_payload->>'last_question_index')::int,
     (p_payload->>'total_questions')::int,
@@ -122,6 +133,7 @@ begin
   on conflict (session_id) do update set
     answers             = excluded.answers,
     completed           = excluded.completed,
+    calidad             = coalesce(excluded.calidad,             survey_responses.calidad),
     last_question_id    = coalesce(excluded.last_question_id,    survey_responses.last_question_id),
     last_question_index = coalesce(excluded.last_question_index, survey_responses.last_question_index),
     total_questions     = coalesce(excluded.total_questions,     survey_responses.total_questions),
@@ -138,6 +150,13 @@ end $$;
 revoke all on public.survey_responses from anon, authenticated;
 revoke all on function public.guardar_respuesta(uuid, text, jsonb) from public, authenticated;
 grant execute on function public.guardar_respuesta(uuid, text, jsonb) to anon;
+
+-- Las vistas de abajo ya son inaccesibles para anon por security_invoker
+-- (no tiene SELECT sobre la tabla base). Revocar además el privilegio deja
+-- dos cerraduras en vez de una.
+revoke all on public.v_resumen, public.v_canales, public.v_abandono,
+              public.v_contactos, public.v_respuestas_validas, public.v_calidad
+       from anon, authenticated;
 
 
 -- ---------- Vistas de análisis ----------
@@ -210,3 +229,21 @@ where completed = true
 
 -- ---------- Comprobación ----------
 -- select * from public.v_resumen;
+
+-- Calidad de las respuestas: cuántas hay que mirar con lupa.
+create or replace view public.v_calidad
+with (security_invoker = true) as
+select
+  survey_type,
+  count(*)                                                            as completadas,
+  count(*) filter (where (calidad->>'atencion_ok') = 'false')         as fallo_atencion,
+  count(*) filter (where (calidad->>'apurado') = 'true')              as apurados,
+  count(*) filter (where (calidad->>'sospecha_linea_recta') = 'true') as linea_recta,
+  count(*) filter (where (calidad->>'atencion_ok') = 'false'
+                      or (calidad->>'apurado') = 'true'
+                      or (calidad->>'sospecha_linea_recta') = 'true') as sospechosas,
+  round(avg((calidad->>'largo_medio_abiertas')::numeric))             as largo_medio_abiertas,
+  round(avg((calidad->>'segundos_por_pregunta')::numeric), 1)         as seg_por_pregunta
+from public.survey_responses
+where completed
+group by survey_type;
