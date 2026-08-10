@@ -240,6 +240,27 @@
         if (racha > mejorRacha) mejorRacha = racha;
       });
 
+      /* Coherencia de Van Westendorp. Las cuatro respuestas tienen que subir:
+       * "tan barato que desconfío" ≤ "buena oferta" ≤ "empieza a ser caro"
+       * ≤ "ni lo considero". Quien las cruza no entendió la pregunta, y su
+       * curva ensucia el cálculo del precio. Se marca, no se descarta. */
+      const esc = [];
+      lista.forEach((q) => {
+        if (!q.vw) return;
+        const v = answers[q.id];
+        const num = v && v.value != null ? Number(v.value) : NaN;
+        esc[q.vw] = isFinite(num) ? num : null;
+      });
+      let vwCoherente = null, vwTecho = null;
+      if (esc[1] != null && esc[2] != null && esc[3] != null && esc[4] != null) {
+        vwCoherente = esc[1] <= esc[2] && esc[2] <= esc[3] && esc[3] <= esc[4];
+        /* Cuántas de las cuatro se fueron al tope de la escalera. Si son
+         * muchas, la escalera se quedó corta y hay que subirle el techo. */
+        const q1 = lista.find((x) => x.vw === 1);
+        const tope = q1 ? Number(q1.options[q1.options.length - 1].value) : null;
+        vwTecho = tope == null ? null : [1, 2, 3, 4].filter((i) => esc[i] === tope).length;
+      }
+
       /* Longitud media de las respuestas abiertas: otra señal de esfuerzo. */
       const abiertas = lista.filter((q) => q.type === 'longtext' || q.type === 'text');
       const largos = abiertas.map((q) => String(answers[q.id] || '').trim().length);
@@ -254,6 +275,8 @@
         linea_recta_max: mejorRacha,
         sospecha_linea_recta: mejorRacha >= 6,
         atencion_ok: atencion,
+        vw_coherente: vwCoherente,
+        vw_en_el_tope: vwTecho,
         largo_medio_abiertas: largoMedio,
         tiempos_por_pregunta: tiempos
       };

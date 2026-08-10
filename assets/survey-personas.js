@@ -10,15 +10,19 @@
 
 /* Escalera de precios compartida por las cuatro preguntas de Van Westendorp.
  * Tiene que ser idéntica en las cuatro para que el cruce de curvas funcione. */
+/* El techo anterior (RD$1,000) se llenó: dos de las tres primeras respuestas
+ * lo eligieron para varias preguntas seguidas, lo que censura el dato y hace
+ * imposible calcular el óptimo. Se sube el techo y se dan más pasos arriba. */
 var ESCALERA_PRECIO = [
   { value: '25', label: 'RD$25' },
   { value: '50', label: 'RD$50' },
   { value: '100', label: 'RD$100' },
-  { value: '150', label: 'RD$150' },
-  { value: '250', label: 'RD$250' },
-  { value: '400', label: 'RD$400' },
+  { value: '200', label: 'RD$200' },
+  { value: '350', label: 'RD$350' },
   { value: '600', label: 'RD$600' },
-  { value: '1000', label: 'RD$1,000 o más' }
+  { value: '1000', label: 'RD$1,000' },
+  { value: '1800', label: 'RD$1,800' },
+  { value: '3000', label: 'RD$3,000 o más' }
 ];
 
 window.PREGUNTAS_PERSONAS = [
@@ -260,26 +264,26 @@ window.PREGUNTAS_PERSONAS = [
    * Las cuatro usan la misma escalera y NO se rotan: el orden es el dato.
    * Solo se muestran a quien no descartó pagar. */
   {
-    id: 'pvw1', type: 'radio', required: true,
+    id: 'pvw1', type: 'radio', required: true, vw: 1,
     title: '¿A qué precio te parecería tan bajo que dudarías de que el servicio de verdad funcione?',
     help: 'Piensa en el cargo por asegurar tu lugar en una salida.',
     showIf: (a) => a.p22 && a.p22.value !== 'no',
     options: ESCALERA_PRECIO
   },
   {
-    id: 'pvw2', type: 'radio', required: true,
+    id: 'pvw2', type: 'radio', required: true, vw: 2,
     title: '¿A qué precio te parecería una buena oferta por ese servicio?',
     showIf: (a) => a.p22 && a.p22.value !== 'no',
     options: ESCALERA_PRECIO
   },
   {
-    id: 'pvw3', type: 'radio', required: true,
+    id: 'pvw3', type: 'radio', required: true, vw: 3,
     title: '¿A qué precio te empezaría a parecer caro, pero aún así lo pensarías?',
     showIf: (a) => a.p22 && a.p22.value !== 'no',
     options: ESCALERA_PRECIO
   },
   {
-    id: 'pvw4', type: 'radio', required: true,
+    id: 'pvw4', type: 'radio', required: true, vw: 4,
     title: '¿A qué precio te parecería tan caro que ni lo considerarías?',
     showIf: (a) => a.p22 && a.p22.value !== 'no',
     options: ESCALERA_PRECIO

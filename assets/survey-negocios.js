@@ -22,15 +22,17 @@ var FUNCIONALIDADES = [
 ];
 
 /* Escalera de precio mensual. Idéntica en las cuatro de Van Westendorp. */
+/* Techo alto a propósito: si la gente se amontona en la última opción,
+ * el dato queda censurado y el óptimo no se puede calcular. */
 var ESCALERA_MENSUAL = [
   { value: '500', label: 'RD$500 al mes' },
   { value: '1500', label: 'RD$1,500 al mes' },
   { value: '3000', label: 'RD$3,000 al mes' },
-  { value: '5000', label: 'RD$5,000 al mes' },
-  { value: '8000', label: 'RD$8,000 al mes' },
-  { value: '12000', label: 'RD$12,000 al mes' },
-  { value: '20000', label: 'RD$20,000 al mes' },
-  { value: '35000', label: 'RD$35,000 al mes o más' }
+  { value: '6000', label: 'RD$6,000 al mes' },
+  { value: '10000', label: 'RD$10,000 al mes' },
+  { value: '18000', label: 'RD$18,000 al mes' },
+  { value: '30000', label: 'RD$30,000 al mes' },
+  { value: '50000', label: 'RD$50,000 al mes o más' }
 ];
 
 window.PREGUNTAS_NEGOCIOS = [
@@ -315,26 +317,26 @@ window.PREGUNTAS_NEGOCIOS = [
   /* ---------- Van Westendorp ----------
    * Misma escalera en las cuatro, sin rotar. Solo a quien no descartó pagar. */
   {
-    id: 'nvw1', type: 'radio', required: true,
+    id: 'nvw1', type: 'radio', required: true, vw: 1,
     title: '¿A qué precio mensual les parecería tan bajo que dudarían de la calidad del servicio?',
     help: 'Piensa en una herramienta que les gestione reservas, clientes y flujo.',
     showIf: (a) => a.n20 && a.n20.value !== 'nada',
     options: ESCALERA_MENSUAL
   },
   {
-    id: 'nvw2', type: 'radio', required: true,
+    id: 'nvw2', type: 'radio', required: true, vw: 2,
     title: '¿A qué precio mensual les parecería una buena inversión?',
     showIf: (a) => a.n20 && a.n20.value !== 'nada',
     options: ESCALERA_MENSUAL
   },
   {
-    id: 'nvw3', type: 'radio', required: true,
+    id: 'nvw3', type: 'radio', required: true, vw: 3,
     title: '¿A qué precio mensual les empezaría a parecer caro, pero aún lo evaluarían?',
     showIf: (a) => a.n20 && a.n20.value !== 'nada',
     options: ESCALERA_MENSUAL
   },
   {
-    id: 'nvw4', type: 'radio', required: true,
+    id: 'nvw4', type: 'radio', required: true, vw: 4,
     title: '¿A qué precio mensual les parecería tan caro que ni lo considerarían?',
     showIf: (a) => a.n20 && a.n20.value !== 'nada',
     options: ESCALERA_MENSUAL
