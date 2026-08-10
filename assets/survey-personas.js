@@ -266,25 +266,28 @@ window.PREGUNTAS_PERSONAS = [
   {
     id: 'pvw1', type: 'radio', required: true, vw: 1,
     title: '¿A qué precio te parecería tan bajo que dudarías de que el servicio de verdad funcione?',
-    help: 'Piensa en el cargo por asegurar tu lugar en una salida.',
+    help: 'Ahora vienen 4 preguntas cortas sobre el mismo precio, vistas desde ángulos distintos. Es la parte que más nos sirve. · 1 de 4',
     showIf: (a) => a.p22 && a.p22.value !== 'no',
     options: ESCALERA_PRECIO
   },
   {
     id: 'pvw2', type: 'radio', required: true, vw: 2,
     title: '¿A qué precio te parecería una buena oferta por ese servicio?',
+    help: '2 de 4',
     showIf: (a) => a.p22 && a.p22.value !== 'no',
     options: ESCALERA_PRECIO
   },
   {
     id: 'pvw3', type: 'radio', required: true, vw: 3,
     title: '¿A qué precio te empezaría a parecer caro, pero aún así lo pensarías?',
+    help: '3 de 4',
     showIf: (a) => a.p22 && a.p22.value !== 'no',
     options: ESCALERA_PRECIO
   },
   {
     id: 'pvw4', type: 'radio', required: true, vw: 4,
     title: '¿A qué precio te parecería tan caro que ni lo considerarías?',
+    help: 'Última de precio · 4 de 4',
     showIf: (a) => a.p22 && a.p22.value !== 'no',
     options: ESCALERA_PRECIO
   },

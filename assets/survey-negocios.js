@@ -319,25 +319,28 @@ window.PREGUNTAS_NEGOCIOS = [
   {
     id: 'nvw1', type: 'radio', required: true, vw: 1,
     title: '¿A qué precio mensual les parecería tan bajo que dudarían de la calidad del servicio?',
-    help: 'Piensa en una herramienta que les gestione reservas, clientes y flujo.',
+    help: 'Ahora vienen 4 preguntas cortas sobre el mismo precio, vistas desde ángulos distintos. Es la parte que más nos sirve. · 1 de 4',
     showIf: (a) => a.n20 && a.n20.value !== 'nada',
     options: ESCALERA_MENSUAL
   },
   {
     id: 'nvw2', type: 'radio', required: true, vw: 2,
     title: '¿A qué precio mensual les parecería una buena inversión?',
+    help: '2 de 4',
     showIf: (a) => a.n20 && a.n20.value !== 'nada',
     options: ESCALERA_MENSUAL
   },
   {
     id: 'nvw3', type: 'radio', required: true, vw: 3,
     title: '¿A qué precio mensual les empezaría a parecer caro, pero aún lo evaluarían?',
+    help: '3 de 4',
     showIf: (a) => a.n20 && a.n20.value !== 'nada',
     options: ESCALERA_MENSUAL
   },
   {
     id: 'nvw4', type: 'radio', required: true, vw: 4,
     title: '¿A qué precio mensual les parecería tan caro que ni lo considerarían?',
+    help: 'Última de precio · 4 de 4',
     showIf: (a) => a.n20 && a.n20.value !== 'nada',
     options: ESCALERA_MENSUAL
   },
