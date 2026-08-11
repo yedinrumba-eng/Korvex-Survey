@@ -172,7 +172,7 @@ window.PREGUNTAS_NEGOCIOS = [
     options: FUNCIONALIDADES
   },
   {
-    id: 'n10b', type: 'radio', required: true, rotate: true, bestWorst: 'peor',
+    id: 'n10b', type: 'radio', required: true, rotate: true, bestWorst: 'peor', excluirDe: 'n10a',
     title: '¿Y cuál sería la MENOS importante?',
     help: 'La que menos falta te hace.',
     options: FUNCIONALIDADES

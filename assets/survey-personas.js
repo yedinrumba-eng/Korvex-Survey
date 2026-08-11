@@ -327,9 +327,9 @@ window.PREGUNTAS_PERSONAS = [
    * La segunda abierta va tarde a propósito: quien llegó hasta aquí
    * ya invirtió tiempo y escribe mucho más que en la pregunta 15. */
   {
-    id: 'p15', type: 'longtext', required: true,
+    id: 'p15', type: 'longtext', required: false,
     title: 'Cuéntanos paso a paso qué haces antes de salir a algún lugar.',
-    help: 'Desde que te nace la idea hasta que llegas. Mientras más detalle, mejor.',
+    help: 'Desde que te nace la idea hasta que llegas. Si no te provoca escribir, puedes saltarla.',
     placeholder: 'Normalmente empiezo por…'
   },
 

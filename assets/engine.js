@@ -154,12 +154,24 @@
 
     function opcionesDe(q) {
       if (!q.options) return [];
-      if (!q.rotate) return q.options;
-      if (ordenCache[q.id]) return ordenCache[q.id];
+
+      /* En un best-worst, la opción elegida como "la mejor" no puede volver a
+       * ofrecerse como "la peor": alguien ya marcó la misma en las dos y esa
+       * respuesta no se puede usar. */
+      let base = q.options;
+      if (q.excluirDe) {
+        const ya = answers[q.excluirDe];
+        if (ya && ya.value) base = base.filter((o) => o.value !== ya.value);
+      }
+
+      if (!q.rotate) return base;
+
+      const clave = q.id + (q.excluirDe ? '|' + base.length : '');
+      if (ordenCache[clave]) return ordenCache[clave];
 
       const libres = [];
       const ancladas = [];
-      q.options.forEach((o) => {
+      base.forEach((o) => {
         if (o.exclusive || o.other) ancladas.push(o);
         else libres.push(o);
       });
