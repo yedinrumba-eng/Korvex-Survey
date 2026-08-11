@@ -172,20 +172,28 @@ body::after {
   letter-spacing: -.022em;
   margin-bottom: 10px;
 }
-.qhelp { color: var(--text-2); font-size: 15px; }
+/* La ayuda bajo el título llevaba instrucciones que la gente se saltaba.
+   Sube de 15 a 16.5 px y gana aire para que se lea de verdad. */
+.qhelp {
+  color: var(--text-2);
+  font-size: 16.5px;
+  line-height: 1.55;
+  margin-top: 5px;
+}
 
+/* "Opcional" y "Puedes elegir varias" estaban en gris sobre vidrio y pasaban
+   desapercibidos. Van en azul sólido, como el botón, para que se vean. */
 .qmeta {
   display: inline-block;
-  margin-top: 12px;
-  font-size: 12.5px;
-  color: var(--text-2);
-  background: var(--glass);
-  -webkit-backdrop-filter: blur(var(--blur)) saturate(var(--sat));
-  backdrop-filter: blur(var(--blur)) saturate(var(--sat));
-  border: 1px solid var(--glass-line);
+  margin-top: 14px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #fff;
+  background: var(--blue);
+  border: 1px solid var(--blue-fill-hi);
   border-radius: 999px;
-  padding: 4px 13px;
-  box-shadow: var(--specular);
+  padding: 6px 16px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .22), 0 4px 14px rgba(47, 67, 234, .3);
 }
 
 

@@ -1,18 +1,20 @@
 /* Encuesta a personas · v4
  *
  * Instrumentos aplicados:
- *   - Van Westendorp (pvw1-pvw4) para el rango de precio aceptable
+ *   - Rango de precio en 3 pasos (pvw1-pvw3): mínimo, bueno, demasiado.
+ *     Antes eran las 4 de Van Westendorp, pero el dato mostró que la
+ *     formulación de manual no se entendía: 2 de 18 contestaron al revés.
+ *     Con 3 se pierde el cruce de curvas y se gana un rango legible.
  *   - Escala Juster (p24) para intención calibrada en probabilidad
  *   - Pregunta trampa de atención (pAtt)
  *   - rotate:true rota el orden de las opciones; las exclusivas y las de "Otro"
  *     quedan ancladas al final. Nunca se rota una escala: el orden es el dato.
  */
 
-/* Escalera de precios compartida por las cuatro preguntas de Van Westendorp.
- * Tiene que ser idéntica en las cuatro para que el cruce de curvas funcione. */
-/* El techo anterior (RD$1,000) se llenó: dos de las tres primeras respuestas
- * lo eligieron para varias preguntas seguidas, lo que censura el dato y hace
- * imposible calcular el óptimo. Se sube el techo y se dan más pasos arriba. */
+/* Escalera de precios. Tiene que ser idéntica en las tres preguntas para
+ * que los valores se puedan comparar entre sí.
+ * El techo anterior (RD$1,000) se llenó: 16 de 18 respuestas lo eligieron,
+ * lo que censura el dato. Se subió a RD$3,000 con más pasos arriba. */
 var ESCALERA_PRECIO = [
   { value: '25', label: 'RD$25' },
   { value: '50', label: 'RD$50' },
@@ -108,7 +110,8 @@ window.PREGUNTAS_PERSONAS = [
   },
   {
     id: 'p8', type: 'radio', required: true, rotate: true,
-    title: '¿Qué factor pesa más al elegir el lugar?',
+    title: '¿Qué es lo que más te importa para decidir si vas a un lugar?',
+    help: 'Escoge la que más peso tiene para ti. Más adelante te preguntamos qué es lo que más se complica.',
     options: [
       { value: 'ambiente', label: 'El ambiente y la gente' },
       { value: 'precio', label: 'El precio' },
@@ -120,7 +123,7 @@ window.PREGUNTAS_PERSONAS = [
   },
   {
     id: 'p9', type: 'radio', required: true,
-    title: '¿Qué tan difícil te resulta encontrar un lugar que realmente te convenza?',
+    title: '¿Qué tan difícil es para ti encontrar un lugar que de verdad te guste?',
     options: [
       { value: 'muy_facil', label: 'Muy fácil' },
       { value: 'algo_facil', label: 'Algo fácil' },
@@ -133,7 +136,7 @@ window.PREGUNTAS_PERSONAS = [
   {
     id: 'p10', type: 'radio', required: true,
     title: '¿Te ha pasado llegar a un lugar y que no esté como esperabas?',
-    help: 'El ambiente, la gente, o que no hubiera espacio.',
+    help: 'Que el ambiente estuviera flojo, que no fuera lo que viste en las fotos, o que no hubiera espacio.',
     options: [
       { value: 'nunca', label: 'Nunca' },
       { value: 'rara_vez', label: 'Rara vez' },
@@ -154,7 +157,7 @@ window.PREGUNTAS_PERSONAS = [
   },
   {
     id: 'p12', type: 'radio', required: true,
-    title: '¿Has intentado asegurar tu entrada o mesa antes de salir?',
+    title: '¿Alguna vez has apartado tu mesa o tu entrada antes de llegar?',
     options: [
       { value: 'frecuente', label: 'Sí, frecuentemente' },
       { value: 'algunas', label: 'Algunas veces' },
@@ -178,7 +181,7 @@ window.PREGUNTAS_PERSONAS = [
   },
   {
     id: 'p14', type: 'radio', required: true,
-    title: '¿Qué tan frustrante te resulta ese proceso?',
+    title: '¿Qué tan molesto es ese proceso para ti?',
     showIf: (a) => a.p12 && a.p12.value !== 'nunca',
     options: [
       { value: 'nada', label: 'Nada frustrante' },
@@ -197,8 +200,8 @@ window.PREGUNTAS_PERSONAS = [
    * la gente para poder ofrecerle la lista correcta. */
   {
     id: 'p16', type: 'radio', required: true, rotate: true,
-    title: '¿Qué es lo más frustrante al momento de decidir a dónde ir?',
-    help: 'Elige lo que más te pasa a ti.',
+    title: 'Cuando van a decidir a dónde ir, ¿qué es lo que más se complica?',
+    help: 'Escoge lo que más te pasa a ti.',
     options: [
       { value: 'acuerdo', label: 'Ponernos de acuerdo entre todos' },
       { value: 'sin_mesa', label: 'Llegar y que no haya mesa o espacio' },
@@ -243,8 +246,8 @@ window.PREGUNTAS_PERSONAS = [
   /* ---------- Bloque 5 · Dinero ---------- */
   {
     id: 'p20', type: 'radio', required: true,
-    title: '¿Has pagado alguna vez por asegurar tu entrada o mesa antes de llegar?',
-    help: 'Cover anticipado, boleta online, consumo mínimo, reserva con depósito.',
+    title: '¿Alguna vez has pagado por adelantado para apartar tu mesa o entrada?',
+    help: 'Cover pagado antes, boleta por internet, consumo mínimo, depósito para reservar.',
     options: [
       { value: 'varias', label: 'Sí, varias veces' },
       { value: 'alguna', label: 'Alguna vez' },
@@ -265,8 +268,8 @@ window.PREGUNTAS_PERSONAS = [
   },
   {
     id: 'p22', type: 'radio', required: true,
-    title: 'Si al reservar, tu lugar quedara garantizado al instante, ¿considerarías pagar un cargo por el servicio?',
-    help: 'Sin filas y sin tener que escribirle a nadie.',
+    title: '¿Pagarías algo por apartar tu mesa y llegar con el puesto garantizado?',
+    help: 'Sin filas, sin llamar y sin escribirle a nadie.',
     options: [
       { value: 'si', label: 'Sí, lo consideraría' },
       { value: 'depende', label: 'Depende del lugar o del evento' },
@@ -279,29 +282,22 @@ window.PREGUNTAS_PERSONAS = [
    * Solo se muestran a quien no descartó pagar. */
   {
     id: 'pvw1', type: 'radio', required: true, vw: 1,
-    title: '¿Qué precio te parecería tan barato que sospecharías que no va a funcionar?',
-    help: 'Imagina esto: desde el celular apartas tu mesa en el lugar que quieres, y cuando llegas está lista. Sin llamar, sin escribirle a nadie, sin fila. Te vamos a preguntar el precio de 4 formas distintas. · 1 de 4',
+    title: '¿Cuánto sería lo mínimo que pagarías por apartar tu mesa?',
+    help: 'Hablamos de esto: abres la app, apartas tu mesa en el lugar que quieres, y cuando llegas está lista esperándote. Sin llamar a nadie, sin escribir, sin hacer fila. Son 3 preguntas de precio. · 1 de 3',
     showIf: (a) => a.p22 && a.p22.value !== 'no',
     options: ESCALERA_PRECIO
   },
   {
     id: 'pvw2', type: 'radio', required: true, vw: 2,
-    title: '¿Qué precio te parecería una ganga por eso?',
-    help: 'Barato, pero sin que te haga dudar. · 2 de 4',
+    title: '¿Qué precio te parecería bueno por apartar esa mesa?',
+    help: 'Un precio con el que pagarías tranquilo, sin pensarlo mucho. · 2 de 3',
     showIf: (a) => a.p22 && a.p22.value !== 'no',
     options: ESCALERA_PRECIO
   },
   {
     id: 'pvw3', type: 'radio', required: true, vw: 3,
-    title: '¿De qué precio en adelante te parecería caro, aunque igual lo pensarías?',
-    help: 'Caro, pero todavía lo considerarías. · 3 de 4',
-    showIf: (a) => a.p22 && a.p22.value !== 'no',
-    options: ESCALERA_PRECIO
-  },
-  {
-    id: 'pvw4', type: 'radio', required: true, vw: 4,
-    title: '¿De qué precio en adelante dirías que es demasiado y no lo pagas?',
-    help: 'Ahí ya te sales. · Última de precio · 4 de 4',
+    title: '¿Qué precio ya sería mucho por apartar esa mesa?',
+    help: 'De ahí en adelante prefieres arriesgarte y llegar sin apartar. · Última de precio · 3 de 3',
     showIf: (a) => a.p22 && a.p22.value !== 'no',
     options: ESCALERA_PRECIO
   },
@@ -309,8 +305,8 @@ window.PREGUNTAS_PERSONAS = [
   /* ---------- Bloque 6 · Intención ---------- */
   {
     id: 'p23', type: 'radio', required: true,
-    title: 'Si existiera una forma de saber en tiempo real cómo está un lugar antes de salir, ¿qué tan útil te parecería?',
-    help: 'Saber el ambiente y el movimiento sin tener que ir a averiguarlo.',
+    title: 'Si pudieras ver en tiempo real cómo está el ambiente del lugar al que quieres ir, ¿qué tan útil sería?',
+    help: 'Ver cuánta gente hay y cómo está la vibra ahora mismo, desde el celular, sin tener que ir a averiguarlo.',
     options: [
       { value: 'nada', label: 'Nada útil' },
       { value: 'poco', label: 'Poco útil' },

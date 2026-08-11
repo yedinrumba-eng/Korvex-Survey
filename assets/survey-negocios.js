@@ -2,7 +2,7 @@
  *
  * Instrumentos aplicados:
  *   - Best-worst scaling (n10a / n10b) para priorizar funcionalidades
- *   - Van Westendorp (nvw1-nvw4) para el rango de precio mensual aceptable
+ *   - Rango de precio mensual en 3 pasos (nvw1-nvw3): mínimo, bueno, demasiado
  *   - Escala Juster (n24) para intención calibrada en probabilidad
  *   - Pregunta trampa de atención (nAtt)
  *   - rotate:true rota el orden de las opciones; las exclusivas y las de "Otro"
@@ -21,7 +21,7 @@ var FUNCIONALIDADES = [
   { value: 'crm', label: 'Gestión de clientes / CRM' }
 ];
 
-/* Escalera de precio mensual. Idéntica en las cuatro de Van Westendorp. */
+/* Escalera de precio mensual. Idéntica en las tres preguntas de precio. */
 /* Techo alto a propósito: si la gente se amontona en la última opción,
  * el dato queda censurado y el óptimo no se puede calcular. */
 var ESCALERA_MENSUAL = [
@@ -115,7 +115,7 @@ window.PREGUNTAS_NEGOCIOS = [
   /* ---------- Bloque 2 · Operación ---------- */
   {
     id: 'n6', type: 'checkbox', required: true, rotate: true,
-    title: '¿Cómo gestionan hoy la llegada de clientes, sea por reserva o por entrada?',
+    title: 'Hoy en día, ¿por dónde les llegan los clientes que quieren reservar o entrar?',
     options: [
       { value: 'telefono', label: 'Teléfono' },
       { value: 'whatsapp', label: 'WhatsApp' },
@@ -143,7 +143,7 @@ window.PREGUNTAS_NEGOCIOS = [
   },
   {
     id: 'n8', type: 'radio', required: true,
-    title: '¿Qué tan predecible es ese flujo de una semana a otra?',
+    title: '¿Qué tan parecido es eso de una semana a otra?',
     options: [
       { value: 'muy_estable', label: 'Muy estable' },
       { value: 'algo_estable', label: 'Algo estable' },
@@ -181,7 +181,7 @@ window.PREGUNTAS_NEGOCIOS = [
   /* ---------- Bloque 4 · Fricción ---------- */
   {
     id: 'n11', type: 'radio', required: true,
-    title: '¿Con qué frecuencia reciben cancelaciones o gente que no se presenta?',
+    title: '¿Cada cuánto les cancelan o simplemente no aparecen?',
     options: [
       { value: 'casi_nunca', label: 'Casi nunca' },
       { value: 'rara_vez', label: 'Rara vez, menos del 5%' },
@@ -204,7 +204,7 @@ window.PREGUNTAS_NEGOCIOS = [
   },
   {
     id: 'n13', type: 'radio', required: true, rotate: true,
-    title: '¿Cómo gestionan los picos de afluencia, como fines de semana o eventos?',
+    title: 'Cuando se llena, como en fines de semana o eventos, ¿qué hacen?',
     options: [
       { value: 'personal', label: 'Aumentamos personal u horario' },
       { value: 'limitar', label: 'Limitamos reservas o trabajamos por turnos' },
@@ -331,37 +331,31 @@ window.PREGUNTAS_NEGOCIOS = [
    * Misma escalera en las cuatro, sin rotar. Solo a quien no descartó pagar. */
   {
     id: 'nvw1', type: 'radio', required: true, vw: 1,
-    title: '¿Qué precio mensual te parecería tan barato que sospecharías que no sirve?',
-    help: 'Imagina una herramienta que te reciba las reservas, te las organice sola y le recuerde al cliente que va. Te preguntamos el precio de 4 formas distintas. · 1 de 4',
+    title: '¿Cuánto sería lo mínimo que pagarían al mes por una herramienta así?',
+    help: 'Hablamos de esto: una herramienta que recibe las reservas por ti, las organiza sola y le recuerda al cliente que va. Son 3 preguntas de precio. · 1 de 3',
     showIf: (a) => a.n20 && a.n20.value !== 'nada',
     options: ESCALERA_MENSUAL
   },
   {
     id: 'nvw2', type: 'radio', required: true, vw: 2,
-    title: '¿Qué precio mensual te parecería una ganga por eso?',
-    help: 'Barato, pero sin que te haga dudar. · 2 de 4',
+    title: '¿Qué precio mensual les parecería bueno por eso?',
+    help: 'Un precio que pagarían tranquilos, sin pensarlo mucho. · 2 de 3',
     showIf: (a) => a.n20 && a.n20.value !== 'nada',
     options: ESCALERA_MENSUAL
   },
   {
     id: 'nvw3', type: 'radio', required: true, vw: 3,
-    title: '¿De qué precio en adelante te parecería caro, aunque igual lo evaluarías?',
-    help: 'Caro, pero todavía lo considerarías. · 3 de 4',
-    showIf: (a) => a.n20 && a.n20.value !== 'nada',
-    options: ESCALERA_MENSUAL
-  },
-  {
-    id: 'nvw4', type: 'radio', required: true, vw: 4,
-    title: '¿De qué precio en adelante dirías que es demasiado y no lo pagas?',
-    help: 'Ahí ya te sales. · Última de precio · 4 de 4',
+    title: '¿Qué precio mensual ya sería mucho para ustedes?',
+    help: 'De ahí en adelante prefieren seguir como están. · Última de precio · 3 de 3',
     showIf: (a) => a.n20 && a.n20.value !== 'nada',
     options: ESCALERA_MENSUAL
   },
 
+
   /* ---------- Bloque 8 · Intención ---------- */
   {
     id: 'n22', type: 'radio', required: true,
-    title: '¿Estarían interesados en evaluar soluciones nuevas para gestionar reservas y flujo de clientes?',
+    title: '¿Les interesaría ver algo nuevo para manejar reservas y clientes?',
     options: [
       { value: 'muy', label: 'Sí, muy interesados' },
       { value: 'algo', label: 'Sí, algo interesados' },
@@ -371,7 +365,7 @@ window.PREGUNTAS_NEGOCIOS = [
   },
   {
     id: 'n23', type: 'radio', required: true, rotate: true,
-    title: '¿Qué factor sería decisivo para adoptar una solución nueva?',
+    title: '¿Qué tendría que cumplir para que ustedes lo usaran?',
     options: [
       { value: 'costo', label: 'El costo' },
       { value: 'facilidad', label: 'Facilidad de uso e implementación' },
