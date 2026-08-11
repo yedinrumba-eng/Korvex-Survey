@@ -239,11 +239,24 @@ window.PREGUNTAS_NEGOCIOS = [
   },
 
   /* ---------- Bloque 5 · La fricción en tus palabras ---------- */
+  /* Antes era abierta. Las opciones salen de lo que ya nos escribieron
+   * («muchos mensajes y no dejan a uno dormir», «los clientes a veces se
+   * complican») más lo que se repite en el sector. */
   {
-    id: 'n15', type: 'longtext', required: true,
-    title: '¿Cuál es la parte más pesada de gestionar reservas, eventos y clientes hoy?',
-    help: 'Escríbelo con tus palabras. Nos interesa lo que de verdad te quita tiempo o te da dolor de cabeza.',
-    placeholder: 'Por ejemplo: los fines de semana entran tantos mensajes que…'
+    id: 'n15', type: 'radio', required: true, rotate: true,
+    title: '¿Qué es lo que más te pesa hoy de manejar los clientes?',
+    help: 'Lo que de verdad te quita tiempo o te da dolor de cabeza.',
+    options: [
+      { value: 'mensajes', label: 'La cantidad de mensajes, y a toda hora' },
+      { value: 'apuntar', label: 'Llevar la cuenta de quién reservó y para cuándo' },
+      { value: 'no_shows', label: 'Gente que reserva y no aparece' },
+      { value: 'picos', label: 'Los fines de semana se desborda todo' },
+      { value: 'personal', label: 'Que todo depende de una persona que se sepa el sistema' },
+      { value: 'clientes', label: 'Clientes que se complican o cambian a última hora' },
+      { value: 'seguimiento', label: 'No poder darle seguimiento al cliente después' },
+      { value: 'nada', label: 'Nada, lo tenemos bajo control', exclusive: true },
+      { value: 'otro', label: 'Otra cosa', other: true }
+    ]
   },
   {
     id: 'n16', type: 'radio', required: true,
@@ -318,29 +331,29 @@ window.PREGUNTAS_NEGOCIOS = [
    * Misma escalera en las cuatro, sin rotar. Solo a quien no descartó pagar. */
   {
     id: 'nvw1', type: 'radio', required: true, vw: 1,
-    title: '¿A qué precio mensual les parecería tan bajo que dudarían de la calidad del servicio?',
-    help: 'Ahora vienen 4 preguntas cortas sobre el mismo precio, vistas desde ángulos distintos. Es la parte que más nos sirve. · 1 de 4',
+    title: '¿Qué precio mensual te parecería tan barato que sospecharías que no sirve?',
+    help: 'Imagina una herramienta que te reciba las reservas, te las organice sola y le recuerde al cliente que va. Te preguntamos el precio de 4 formas distintas. · 1 de 4',
     showIf: (a) => a.n20 && a.n20.value !== 'nada',
     options: ESCALERA_MENSUAL
   },
   {
     id: 'nvw2', type: 'radio', required: true, vw: 2,
-    title: '¿A qué precio mensual les parecería una buena inversión?',
-    help: '2 de 4',
+    title: '¿Qué precio mensual te parecería una ganga por eso?',
+    help: 'Barato, pero sin que te haga dudar. · 2 de 4',
     showIf: (a) => a.n20 && a.n20.value !== 'nada',
     options: ESCALERA_MENSUAL
   },
   {
     id: 'nvw3', type: 'radio', required: true, vw: 3,
-    title: '¿A qué precio mensual les empezaría a parecer caro, pero aún lo evaluarían?',
-    help: '3 de 4',
+    title: '¿De qué precio en adelante te parecería caro, aunque igual lo evaluarías?',
+    help: 'Caro, pero todavía lo considerarías. · 3 de 4',
     showIf: (a) => a.n20 && a.n20.value !== 'nada',
     options: ESCALERA_MENSUAL
   },
   {
     id: 'nvw4', type: 'radio', required: true, vw: 4,
-    title: '¿A qué precio mensual les parecería tan caro que ni lo considerarían?',
-    help: 'Última de precio · 4 de 4',
+    title: '¿De qué precio en adelante dirías que es demasiado y no lo pagas?',
+    help: 'Ahí ya te sales. · Última de precio · 4 de 4',
     showIf: (a) => a.n20 && a.n20.value !== 'nada',
     options: ESCALERA_MENSUAL
   },
@@ -390,9 +403,9 @@ window.PREGUNTAS_NEGOCIOS = [
   /* ---------- Bloque 9 · Cierre ---------- */
   {
     id: 'n25', type: 'longtext', required: false,
-    title: '¿Qué necesitarían ver para confiar en una herramienta así?',
-    help: 'Opcional, pero es de lo más útil que nos puedes dejar.',
-    placeholder: '¿Qué te haría decir que sí, o qué te haría desconfiar?'
+    title: '¿Hay algo más que quieras decirnos?',
+    help: 'Opcional. Si algo no te preguntamos y crees que importa, aquí es.',
+    placeholder: 'Escribe con toda confianza, o salta esta pregunta.'
   },
   {
     id: 'n26', type: 'radio', required: true,

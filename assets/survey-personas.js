@@ -191,11 +191,25 @@ window.PREGUNTAS_PERSONAS = [
   /* ---------- Bloque 4 · La fricción en tus palabras ----------
    * Única abierta de la primera mitad, y llega justo cuando el tema
    * de la frustración ya está abierto en la cabeza del que responde. */
+  /* Antes era pregunta abierta. Las opciones de abajo NO son inventadas:
+   * salen de agrupar las 19 respuestas escritas que ya recogimos. Por eso
+   * se cierra ahora y no antes — primero había que saber qué contestaba
+   * la gente para poder ofrecerle la lista correcta. */
   {
-    id: 'p16', type: 'longtext', required: true,
+    id: 'p16', type: 'radio', required: true, rotate: true,
     title: '¿Qué es lo más frustrante al momento de decidir a dónde ir?',
-    help: 'Con tus palabras. Esta es la que más nos ayuda de toda la encuesta.',
-    placeholder: 'Lo que más me molesta es…'
+    help: 'Elige lo que más te pasa a ti.',
+    options: [
+      { value: 'acuerdo', label: 'Ponernos de acuerdo entre todos' },
+      { value: 'sin_mesa', label: 'Llegar y que no haya mesa o espacio' },
+      { value: 'ambiente_incierto', label: 'No saber cómo va a estar el ambiente esa noche' },
+      { value: 'fotos', label: 'Que el lugar no sea como se veía en las fotos' },
+      { value: 'que_coincida', label: 'Que coincidan buena comida, buen ambiente y buen servicio' },
+      { value: 'tiempo', label: 'Buscar y comparar opciones me toma mucho tiempo' },
+      { value: 'precio', label: 'No saber cuánto voy a terminar gastando' },
+      { value: 'nada', label: 'Nada, la verdad no me resulta frustrante', exclusive: true },
+      { value: 'otro', label: 'Otra cosa', other: true }
+    ]
   },
   {
     id: 'p18', type: 'radio', required: true, rotate: true,
@@ -265,29 +279,29 @@ window.PREGUNTAS_PERSONAS = [
    * Solo se muestran a quien no descartó pagar. */
   {
     id: 'pvw1', type: 'radio', required: true, vw: 1,
-    title: '¿A qué precio te parecería tan bajo que dudarías de que el servicio de verdad funcione?',
-    help: 'Ahora vienen 4 preguntas cortas sobre el mismo precio, vistas desde ángulos distintos. Es la parte que más nos sirve. · 1 de 4',
+    title: '¿Qué precio te parecería tan barato que sospecharías que no va a funcionar?',
+    help: 'Imagina esto: desde el celular apartas tu mesa en el lugar que quieres, y cuando llegas está lista. Sin llamar, sin escribirle a nadie, sin fila. Te vamos a preguntar el precio de 4 formas distintas. · 1 de 4',
     showIf: (a) => a.p22 && a.p22.value !== 'no',
     options: ESCALERA_PRECIO
   },
   {
     id: 'pvw2', type: 'radio', required: true, vw: 2,
-    title: '¿A qué precio te parecería una buena oferta por ese servicio?',
-    help: '2 de 4',
+    title: '¿Qué precio te parecería una ganga por eso?',
+    help: 'Barato, pero sin que te haga dudar. · 2 de 4',
     showIf: (a) => a.p22 && a.p22.value !== 'no',
     options: ESCALERA_PRECIO
   },
   {
     id: 'pvw3', type: 'radio', required: true, vw: 3,
-    title: '¿A qué precio te empezaría a parecer caro, pero aún así lo pensarías?',
-    help: '3 de 4',
+    title: '¿De qué precio en adelante te parecería caro, aunque igual lo pensarías?',
+    help: 'Caro, pero todavía lo considerarías. · 3 de 4',
     showIf: (a) => a.p22 && a.p22.value !== 'no',
     options: ESCALERA_PRECIO
   },
   {
     id: 'pvw4', type: 'radio', required: true, vw: 4,
-    title: '¿A qué precio te parecería tan caro que ni lo considerarías?',
-    help: 'Última de precio · 4 de 4',
+    title: '¿De qué precio en adelante dirías que es demasiado y no lo pagas?',
+    help: 'Ahí ya te sales. · Última de precio · 4 de 4',
     showIf: (a) => a.p22 && a.p22.value !== 'no',
     options: ESCALERA_PRECIO
   },
@@ -323,14 +337,25 @@ window.PREGUNTAS_PERSONAS = [
     ]
   },
 
-  /* ---------- Bloque 7 · El proceso, en tus palabras ----------
-   * La segunda abierta va tarde a propósito: quien llegó hasta aquí
-   * ya invirtió tiempo y escribe mucho más que en la pregunta 15. */
+  /* ---------- Bloque 7 · El proceso ----------
+   * También era abierta. Los pasos de abajo son los que aparecieron en las
+   * respuestas escritas: Instagram, revisar menú y precios, leer reseñas,
+   * cuadrar con el grupo, llamar para apartar. */
   {
-    id: 'p15', type: 'longtext', required: false,
-    title: 'Cuéntanos paso a paso qué haces antes de salir a algún lugar.',
-    help: 'Desde que te nace la idea hasta que llegas. Si no te provoca escribir, puedes saltarla.',
-    placeholder: 'Normalmente empiezo por…'
+    id: 'p15', type: 'checkbox', required: true, rotate: true,
+    title: 'Antes de salir a un lugar, ¿qué sueles hacer?',
+    help: 'Marca todo lo que aplique.',
+    options: [
+      { value: 'redes', label: 'Busco el lugar en Instagram o TikTok' },
+      { value: 'menu', label: 'Reviso el menú y los precios' },
+      { value: 'resenas', label: 'Leo reseñas u opiniones' },
+      { value: 'grupo', label: 'Le escribo al grupo para ponernos de acuerdo' },
+      { value: 'apartar', label: 'Llamo o escribo al lugar para apartar' },
+      { value: 'evento', label: 'Reviso si hay evento o algo especial ese día' },
+      { value: 'ubicacion', label: 'Miro dónde queda y cómo llegar' },
+      { value: 'nada', label: 'Nada, ya sé a dónde voy y llego', exclusive: true },
+      { value: 'otro', label: 'Otra cosa', other: true }
+    ]
   },
 
   /* ---------- Bloque 8 · Segmentación ---------- */
@@ -375,6 +400,14 @@ window.PREGUNTAS_PERSONAS = [
       { value: 'f', label: 'Femenino' },
       { value: 'nd', label: 'Prefiero no decirlo' }
     ]
+  },
+  /* Única abierta que queda: opcional, corta y al final. Es la válvula
+   * para que aparezca algo que no se nos ocurrió poner en ninguna lista. */
+  {
+    id: 'p31', type: 'longtext', required: false,
+    title: '¿Hay algo más que quieras decirnos?',
+    help: 'Opcional. Si algo no te preguntamos y crees que importa, aquí es.',
+    placeholder: 'Escribe con toda confianza, o salta esta pregunta.'
   },
   {
     id: 'p28', type: 'radio', required: true,
