@@ -263,16 +263,23 @@
         const num = v && v.value != null ? Number(v.value) : NaN;
         esc[q.vw] = isFinite(num) ? num : null;
       });
-      let vwCoherente = null, vwTecho = null;
+      let vwCoherente = null, vwTecho = null, vwRango = null, vwPlano = null;
       const pasos = esc.filter((v) => v != null);
       const total = lista.filter((q) => q.vw).length;
       if (total > 0 && pasos.length === total) {
         vwCoherente = pasos.every((v, i) => i === 0 || pasos[i - 1] <= v);
+
         /* Cuántas se fueron al tope de la escalera. Si son muchas, la
          * escalera se quedó corta y hay que subirle el techo. */
         const q1 = lista.find((x) => x.vw === 1);
         const tope = q1 ? Number(q1.options[q1.options.length - 1].value) : null;
         vwTecho = tope == null ? null : pasos.filter((v) => v === tope).length;
+
+        /* Rango entre el mínimo y el "ya es mucho". Si es cero, la persona
+         * puso el mismo número en las tres: la respuesta es coherente pero
+         * no dice nada, y hay que poder excluirla del cálculo. */
+        vwRango = pasos[pasos.length - 1] - pasos[0];
+        vwPlano = vwRango === 0;
       }
 
       /* Longitud media de las respuestas abiertas: otra señal de esfuerzo. */
@@ -291,6 +298,8 @@
         atencion_ok: atencion,
         vw_coherente: vwCoherente,
         vw_en_el_tope: vwTecho,
+        vw_rango: vwRango,
+        vw_plano: vwPlano,
         largo_medio_abiertas: largoMedio,
         tiempos_por_pregunta: tiempos
       };
