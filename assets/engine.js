@@ -43,15 +43,54 @@
     };
   }
 
+  /* De dónde vino la persona.
+   * Primero manda la etiqueta ?src= que ponemos nosotros. Si no la hay,
+   * lo deducimos: las redes le pegan su propio identificador de clic al
+   * enlace (fbclid de Meta, gclid de Google, ttclid de TikTok) y eso
+   * delata el origen aunque se nos haya olvidado etiquetar. */
+  function deducirOrigen(p, referrer) {
+    const explicito = p.get('src') || p.get('utm_source');
+    if (explicito) return explicito;
+
+    if (p.get('fbclid')) return 'meta-auto';
+    if (p.get('gclid')) return 'google-auto';
+    if (p.get('ttclid')) return 'tiktok-auto';
+    if (p.get('igshid')) return 'instagram-auto';
+
+    const r = (referrer || '').toLowerCase();
+    if (/instagram\./.test(r)) return 'instagram-auto';
+    if (/facebook\.|fb\.com|fb\.me/.test(r)) return 'facebook-auto';
+    if (/tiktok\./.test(r)) return 'tiktok-auto';
+    if (/whatsapp\./.test(r)) return 'whatsapp-auto';
+    if (/t\.co|twitter\.|x\.com/.test(r)) return 'x-auto';
+    if (/fbclid/.test(r)) return 'meta-auto';
+
+    return 'directo';
+  }
+
+  /* El referrer trae identificadores de clic que permiten reidentificar a
+   * la persona en la red de origen. No los necesitamos: guardamos solo el
+   * dominio y la ruta. */
+  function limpiarReferrer(url) {
+    if (!url) return null;
+    try {
+      const u = new URL(url);
+      return (u.origin + u.pathname).slice(0, 300);
+    } catch (e) {
+      return String(url).split('?')[0].slice(0, 300);
+    }
+  }
+
   function collectMeta() {
     const p = new URLSearchParams(location.search);
     const ua = navigator.userAgent;
     const mobile = /Android|iPhone|iPad|iPod|Mobile|Opera Mini/i.test(ua);
     const tablet = /iPad|Tablet/i.test(ua);
+    const ref = document.referrer || null;
     return {
-      source: p.get('src') || p.get('utm_source') || 'directo',
+      source: deducirOrigen(p, ref),
       campaign: p.get('utm_campaign') || null,
-      referrer: document.referrer || null,
+      referrer: limpiarReferrer(ref),
       device_type: tablet ? 'tablet' : (mobile ? 'movil' : 'escritorio'),
       user_agent: ua.slice(0, 400),
       language: navigator.language || null,
