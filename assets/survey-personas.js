@@ -11,20 +11,21 @@
  *     quedan ancladas al final. Nunca se rota una escala: el orden es el dato.
  */
 
-/* Escalera de precios. Tiene que ser idéntica en las tres preguntas para
- * que los valores se puedan comparar entre sí.
- * El techo anterior (RD$1,000) se llenó: 16 de 18 respuestas lo eligieron,
- * lo que censura el dato. Se subió a RD$3,000 con más pasos arriba. */
+/* Escalera de precios del CARGO POR SERVICIO, no de lo que cobra el lugar.
+ * Las respuestas anteriores llegaban a RD$1,000 porque la pregunta no
+ * separaba las dos cosas: la gente valoraba la mesa, no el servicio.
+ * Seis de los nueve escalones están en RD$200 o menos, que es donde vive
+ * la decisión. La cola alta se queda por si alguien sí pagaría más. */
 var ESCALERA_PRECIO = [
   { value: '25', label: 'RD$25' },
   { value: '50', label: 'RD$50' },
+  { value: '75', label: 'RD$75' },
   { value: '100', label: 'RD$100' },
+  { value: '150', label: 'RD$150' },
   { value: '200', label: 'RD$200' },
-  { value: '350', label: 'RD$350' },
-  { value: '600', label: 'RD$600' },
-  { value: '1000', label: 'RD$1,000' },
-  { value: '1800', label: 'RD$1,800' },
-  { value: '3000', label: 'RD$3,000 o más' }
+  { value: '300', label: 'RD$300' },
+  { value: '500', label: 'RD$500' },
+  { value: '800', label: 'Más de RD$500' }
 ];
 
 window.PREGUNTAS_PERSONAS = [
@@ -268,8 +269,8 @@ window.PREGUNTAS_PERSONAS = [
   },
   {
     id: 'p22', type: 'radio', required: true,
-    title: '¿Pagarías algo por apartar tu mesa y llegar con el puesto garantizado?',
-    help: 'Sin filas, sin llamar y sin escribirle a nadie.',
+    title: 'Además de lo que cobre el lugar, ¿pagarías un cargo pequeño por que te procesen la reserva?',
+    help: 'Como en PedidosYa o Uber: una cosa es lo que cuesta la comida o el viaje, y otra el cargo por el servicio. Aquí igual — el lugar cobra lo suyo, y aparte va el cargo por apartarte el puesto.',
     options: [
       { value: 'si', label: 'Sí, lo consideraría' },
       { value: 'depende', label: 'Depende del lugar o del evento' },
@@ -282,22 +283,22 @@ window.PREGUNTAS_PERSONAS = [
    * Solo se muestran a quien no descartó pagar. */
   {
     id: 'pvw1', type: 'radio', required: true, vw: 1,
-    title: '¿Cuánto sería lo mínimo que pagarías por apartar tu mesa?',
-    help: 'Hablamos de esto: abres la app, apartas tu mesa en el lugar que quieres, y cuando llegas está lista esperándote. Sin llamar a nadie, sin escribir, sin hacer fila. Son 3 preguntas de precio. · 1 de 3',
+    title: '¿Cuánto sería lo mínimo que pagarías por ese cargo de servicio?',
+    help: 'Solo el cargo por procesarte la reserva. NO lo que cobre el lugar por la mesa, el cover o el consumo. · 1 de 3',
     showIf: (a) => a.p22 && a.p22.value !== 'no',
     options: ESCALERA_PRECIO
   },
   {
     id: 'pvw2', type: 'radio', required: true, vw: 2,
-    title: '¿Qué precio te parecería bueno por apartar esa mesa?',
-    help: 'Un precio con el que pagarías tranquilo, sin pensarlo mucho. · 2 de 3',
+    title: '¿Qué cargo por servicio te parecería bueno?',
+    help: 'Un monto que pagarías tranquilo, sin pensarlo mucho. · 2 de 3',
     showIf: (a) => a.p22 && a.p22.value !== 'no',
     options: ESCALERA_PRECIO
   },
   {
     id: 'pvw3', type: 'radio', required: true, vw: 3,
-    title: '¿Qué precio ya sería mucho por apartar esa mesa?',
-    help: 'De ahí en adelante prefieres arriesgarte y llegar sin apartar. · Última de precio · 3 de 3',
+    title: '¿Qué cargo por servicio ya sería mucho?',
+    help: 'De ahí en adelante prefieres llamar tú al lugar o arriesgarte a llegar sin apartar. · Última de precio · 3 de 3',
     showIf: (a) => a.p22 && a.p22.value !== 'no',
     options: ESCALERA_PRECIO
   },
